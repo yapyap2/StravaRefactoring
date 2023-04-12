@@ -3,6 +3,7 @@ package com.example.stravarefactoring.DTO;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -78,9 +79,8 @@ public class User {
     @JsonIgnore
     private int rideSeq;
 
-//    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "userId")
-//    @Fetch(FetchMode.SELECT)
-//    private List<Ride> rides = new ArrayList<>();
+    @OneToMany
+    private List<Ride> rides = new ArrayList<>();
 //
 //    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId")
 //    @Fetch(FetchMode.SELECT)

@@ -1,9 +1,7 @@
 package com.example.stravarefactoring;
 
-import com.example.stravarefactoring.DTO.Token;
-import com.example.stravarefactoring.DTO.User;
-import com.example.stravarefactoring.DTO.UserInfo;
-import com.example.stravarefactoring.DTO.UserStatus;
+import com.example.stravarefactoring.DTO.*;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -15,6 +13,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -29,6 +28,8 @@ public class StravaApiClientTest {
     UserInfo userInfo;
     UserStatus userStatus;
 
+    List<Ride> rideList;
+
     @BeforeEach
     public void before() throws IOException {
         client.setWebClient(WebClient.create());
@@ -40,6 +41,7 @@ public class StravaApiClientTest {
         token = objectMapper.readValue(new File("src/main/resources/static/json/Token.json"), Token.class);
         userInfo = objectMapper.readValue(new File("src/main/resources/static/json/UserInfo.json"), UserInfo.class);
         userStatus = objectMapper.readValue(new File("src/main/resources/static/json/UserStatus.json"), UserStatus.class);
+        rideList = objectMapper.readValue(new File("src/main/resources/static/activities.json"), new TypeReference<List<Ride>>() {});
     }
 
     private void mocking(){
@@ -48,6 +50,7 @@ public class StravaApiClientTest {
         when(client.getToken(anyString())).thenReturn(token);
         when(client.getUserInfo(any(Token.class))).thenReturn(userInfo);
         when(client.getUserStatus(any(Token.class))).thenReturn(userStatus);
+        when(client.getRide(any(String.class), any(Integer.class))).thenReturn(rideList);
     }
 
     @Test
@@ -74,5 +77,21 @@ public class StravaApiClientTest {
 
 
         System.out.println(user);
+    }
+
+    @Test
+    public void getRideTest(){
+        List<Ride> list = client.getRide("a2e4cfed8d6d09e458ec9cc24209b051c05fd007", 1);
+
+        list.forEach(i -> System.out.println(i));
+    }
+
+    @Test
+    public void getRideTestMocking(){
+        mocking();
+
+        List<Ride> list = client.getRide( "sdad", 23);
+
+        System.out.println(list.size());
     }
 }

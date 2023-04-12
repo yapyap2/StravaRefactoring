@@ -11,6 +11,6 @@ public class ApiAddress {
         return "https://www.strava.com/api/v3/athletes/" + id.toString() + "/stats";
     }
     public static final String ATHLETE_INFO_API = "https://www.strava.com/api/v3/athlete";
-
     public static final String ATHLETE_STATUS_API = "https://www.strava.com/api/v3/athletes/15580355/stats";
+    public static final String GET_RIDE_100 = "https://www.strava.com/api/v3/athlete/activities?per_page=100?per_page=100&page=";
 }
