@@ -1,6 +1,8 @@
-package com.example.stravarefactoring;
+package com.example.stravarefactoring.Controller;
 
+import com.example.stravarefactoring.ApiAddress;
 import com.example.stravarefactoring.DTO.Token;
+import com.example.stravarefactoring.JsonReader;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +27,8 @@ public class Controller {
             connection.setRequestMethod("POST");
 
             String res = JsonReader.readJson(connection);
+
+            System.out.println(res);
 
             ObjectMapper mapper = new ObjectMapper();
 

@@ -42,7 +42,6 @@ public class User {
     private String refreshToken;
     private String accessToken;
 
-
     private int id;
     private String name;
     private LocalDateTime lastUpdated;
