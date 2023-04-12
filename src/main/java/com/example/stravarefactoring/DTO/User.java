@@ -1,13 +1,18 @@
 package com.example.stravarefactoring.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
+@Entity
 public class User {
 
     public User(Token token){
@@ -42,6 +47,7 @@ public class User {
     private String refreshToken;
     private String accessToken;
 
+    @Id
     private int id;
     private String name;
     private LocalDateTime lastUpdated;

@@ -3,8 +3,10 @@ package com.example.stravarefactoring;
 import com.example.stravarefactoring.DTO.Token;
 import com.example.stravarefactoring.DTO.UserInfo;
 import com.example.stravarefactoring.DTO.UserStatus;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
+@Component
 public class StravaApiClient {
     private WebClient webClient;
 

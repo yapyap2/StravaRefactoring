@@ -1,37 +1,46 @@
-package com.example.stravarefactoring;
+package com.example.stravarefactoring.Service;
+
 
 import com.example.stravarefactoring.DTO.Token;
 import com.example.stravarefactoring.DTO.User;
 import com.example.stravarefactoring.DTO.UserInfo;
 import com.example.stravarefactoring.DTO.UserStatus;
+import com.example.stravarefactoring.Repository.UserRepository;
+import com.example.stravarefactoring.StravaApiClient;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.mockito.ArgumentCaptor;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 import java.io.IOException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-public class StravaApiClientTest {
-
-    StravaApiClient client = new StravaApiClient();
-
+public class UserServiceTest {
     Token token;
     UserInfo userInfo;
     UserStatus userStatus;
+    @Mock
+    StravaApiClient client;
+    UserService userService;
+    @Mock
+    UserRepository userRepository;
 
     @BeforeEach
     public void before() throws IOException {
-        client.setWebClient(WebClient.create());
+        MockitoAnnotations.openMocks(this);
+
+        userService = new UserService();
+        userService.setUserRepository(userRepository);
+        userService.setStravaApiClient(client);
+
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -43,36 +52,20 @@ public class StravaApiClientTest {
     }
 
     private void mocking(){
-        this.client = mock(StravaApiClient.class);
-
         when(client.getToken(anyString())).thenReturn(token);
         when(client.getUserInfo(any(Token.class))).thenReturn(userInfo);
         when(client.getUserStatus(any(Token.class))).thenReturn(userStatus);
     }
-
     @Test
-    public void StravaApiClientTest(){
-
-        Token token = client.getToken("94c1333f0a2070b91bfb09bf7cbfb2d865d5c1ff");
-        User user = new User(token);
-
-        user.setUserInfo(client.getUserInfo(token));
-        user.setUserStatus(client.getUserStatus(token));
-
-        System.out.println(user);
-    }
-
-    @Test
-    public void mockingTest(){
+    public void userAddTest(){
         mocking();
 
-        Token t = client.getToken("fake Code");
+        userService.addUser(anyString());
 
-        User user = new User(t);
-        user.setUserInfo(client.getUserInfo(t));
-        user.setUserStatus(client.getUserStatus(t));
+        ArgumentCaptor<User> userArgumentCaptor= ArgumentCaptor.forClass(User.class);
 
+        verify(userRepository).save(userArgumentCaptor.capture());
 
-        System.out.println(user);
+        System.out.println(userArgumentCaptor.getValue());
     }
 }
