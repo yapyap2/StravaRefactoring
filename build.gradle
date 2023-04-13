@@ -37,6 +37,8 @@ dependencies {
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation 'org.projectlombok:lombok'
 
+// https://mvnrepository.com/artifact/org.aspectj/aspectjweaver
+    runtimeOnly group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.19'
 
 
 

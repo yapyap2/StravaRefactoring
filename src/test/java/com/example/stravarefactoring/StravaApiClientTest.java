@@ -13,6 +13,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -32,7 +34,6 @@ public class StravaApiClientTest {
 
     @BeforeEach
     public void before() throws IOException {
-        client.setWebClient(WebClient.create());
 
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -93,5 +94,18 @@ public class StravaApiClientTest {
         List<Ride> list = client.getRide( "sdad", 23);
 
         System.out.println(list.size());
+    }
+
+    @Test
+    public void updateRideTest(){
+
+        String token = "d20bf028e40935e1447bb8db0d23974a8f455d04";
+
+        String time = "2023-02-01 00:00:00";
+        LocalDateTime localDateTime = LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+
+        List<Ride> rides = client.getRideAfter(token, 1, localDateTime);
+
+        rides.forEach(r -> System.out.println(r));
     }
 }

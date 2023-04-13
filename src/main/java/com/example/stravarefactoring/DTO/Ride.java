@@ -1,5 +1,6 @@
 package com.example.stravarefactoring.DTO;
 
+import com.example.stravarefactoring.Annotation.RideConstructor;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -48,6 +49,7 @@ public class Ride {
     public double average_speed;
 
 
+    @RideConstructor
     @JsonCreator
     public Ride(@JsonProperty("athlete") HashMap<String, Object> athlete, @JsonProperty("name")String name, @JsonProperty("distance")double distance, @JsonProperty("moving_time")int moving_time, @JsonProperty("total_elevation_gain")double total_elevation_gain, @JsonProperty("start_date_local")LocalDateTime start_date_local, @JsonProperty("map")HashMap<String, Object> map, @JsonProperty("average_speed")double average_speed, @JsonProperty("kudos_count")int kudos_count, @JsonProperty("comment_count")int comment_count, @JsonProperty("total_photo_count")int total_photo_count, @JsonProperty("average_watts")int average_watts
     ) {
