@@ -2,8 +2,13 @@ package com.example.stravarefactoring.Controller;
 
 import com.example.stravarefactoring.ApiAddress;
 import com.example.stravarefactoring.DTO.Token;
+import com.example.stravarefactoring.DTO.User;
 import com.example.stravarefactoring.JsonReader;
+import com.example.stravarefactoring.Service.UserService;
+import com.example.stravarefactoring.StravaApiClient;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -13,32 +18,13 @@ import java.net.ProtocolException;
 import java.net.URL;
 
 @RestController
+@RequiredArgsConstructor
 public class Controller {
+    private final UserService userService;
 
     @GetMapping("/request")
-    public void userRequest(@RequestParam("code") String code){
-        HttpURLConnection connection;
+    public User userRequest(@RequestParam("code") String code){
 
-        Token token;
-
-        try {
-            URL url = new URL(ApiAddress.stravaGetToken(code));
-            connection = (HttpURLConnection) url.openConnection();
-            connection.setRequestMethod("POST");
-
-            String res = JsonReader.readJson(connection);
-
-            System.out.println(res);
-
-            ObjectMapper mapper = new ObjectMapper();
-
-            token = mapper.readValue(res, Token.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);   /** 스트라바 API 오류 예외처리 필요 **/
-        }
-
-        System.out.println(token);
-
+        return userService.addUser(code);
     }
-
 }
