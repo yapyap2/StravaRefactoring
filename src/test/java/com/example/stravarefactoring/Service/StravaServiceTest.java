@@ -21,6 +21,7 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.util.AssertionErrors.assertEquals;
+import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 public class StravaServiceTest {
 
@@ -29,9 +30,12 @@ public class StravaServiceTest {
     StravaApiClient client;
     Token token;
     List<Ride> rideList;
+    List<Ride> beforeRidelist;
+    List<Ride> afterRideList;
     User user;
     UserStatus userStatus;
     UserInfo userInfo;
+
     @BeforeEach
     public void before() throws IOException {
         rideRepository = mock(RideRepository.class);
@@ -48,6 +52,9 @@ public class StravaServiceTest {
         userInfo = objectMapper.readValue(new File("src/main/resources/static/json/UserInfo.json"), UserInfo.class);
         userStatus = objectMapper.readValue(new File("src/main/resources/static/json/UserStatus.json"), UserStatus.class);
         rideList = objectMapper.readValue(new File("src/main/resources/static/activities.json"), new TypeReference<List<Ride>>() {});
+        beforeRidelist = objectMapper.readValue(new File("src/main/resources/static/beforeActivity.json"), new TypeReference<List<Ride>>() {});
+        afterRideList = objectMapper.readValue(new File("src/main/resources/static/afterActivity.json"), new TypeReference<List<Ride>>() {});
+
     }
 
     private void initializeUser(){
@@ -82,10 +89,11 @@ public class StravaServiceTest {
         assertEquals("name", captor.getValue().get(0).getName(), "KNU 200 Brevet");
     }
 
-
     @Test
-    public void rideSeqAspectTest(){
+    public void updateRideTest(){
         initializeUser();
+
+        user.setRides(beforeRidelist);
 
         Answer<List<Ride>> answer = new Answer<List<Ride>>() {
             int count = 1;
@@ -93,7 +101,7 @@ public class StravaServiceTest {
             public List<Ride> answer(InvocationOnMock invocation) throws Throwable {
                 if(count == 1) {
                     count++;
-                    return rideList;
+                    return afterRideList;
                 }
                 else return new ArrayList<>();
             }
@@ -105,9 +113,10 @@ public class StravaServiceTest {
         ArgumentCaptor<List<Ride>> captor = ArgumentCaptor.forClass(List.class);
         verify(rideRepository).saveAll(captor.capture());
 
-        List<Ride> list = captor.getValue();
+        List<Ride> saveList = captor.getValue();
 
-        assertEquals("rideSeq", list.get(0).getRideId(), 1);
+        assertTrue("dateTime", saveList.get(saveList.size() - 1).getStart_date_local().isAfter(beforeRidelist.get(0).getStart_date_local()));
     }
+
 
 }

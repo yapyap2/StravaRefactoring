@@ -10,6 +10,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Collections;
 import java.util.List;
 
 @Component
@@ -52,8 +53,19 @@ public class StravaApiClient {
 
     public List<Ride> getRideAfter(String token, int page, LocalDateTime time){
         Long timeLong = time.atZone(ZoneId.systemDefault()).toEpochSecond();
-        return webClient.get()
+        List<Ride> returnList = webClient.get()
                 .uri(ApiAddress.GET_RIDE_100 + Integer.toString(page) + "&after=" + timeLong.toString())
+                .header("Authorization", "Bearer " + token)
+                .retrieve()
+                .bodyToFlux(Ride.class)
+                .collectList().block();
+        Collections.reverse(returnList);
+        return returnList;
+    }
+
+    public List<Ride> getOneRide(String token){
+        return webClient.get()
+                .uri(ApiAddress.GET_RIDE_1)
                 .header("Authorization", "Bearer " + token)
                 .retrieve()
                 .bodyToFlux(Ride.class)

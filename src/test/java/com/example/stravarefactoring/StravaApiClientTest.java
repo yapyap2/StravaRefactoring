@@ -82,7 +82,7 @@ public class StravaApiClientTest {
 
     @Test
     public void getRideTest(){
-        List<Ride> list = client.getRide("a2e4cfed8d6d09e458ec9cc24209b051c05fd007", 1);
+        List<Ride> list = client.getRide("7b6c8b4903efd7541d3d02b8fcd46bb4319ae13c", 1);
 
         list.forEach(i -> System.out.println(i));
     }
@@ -99,7 +99,7 @@ public class StravaApiClientTest {
     @Test
     public void updateRideTest(){
 
-        String token = "d20bf028e40935e1447bb8db0d23974a8f455d04";
+        String token = "7b6c8b4903efd7541d3d02b8fcd46bb4319ae13c";
 
         String time = "2023-02-01 00:00:00";
         LocalDateTime localDateTime = LocalDateTime.parse(time, DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));

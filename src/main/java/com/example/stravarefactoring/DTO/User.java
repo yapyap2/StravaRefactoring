@@ -20,7 +20,7 @@ public class User {
 
         this.refreshToken = token.getRefresh_token();
         this.accessToken = token.getAccess_token();
-
+        this.rideSeq = 1;
     }
 
     public void setUserInfo(UserInfo info){
