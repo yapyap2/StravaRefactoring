@@ -30,6 +30,6 @@ public class UserRepositoryTest {
 
         userRepository.save(user);
 
-        assertThat(userRepository.getUserById(user.getId()).getName(), is(user.getName()));
+        assertThat(userRepository.findUserById(user.getId()).getName(), is(user.getName()));
     }
 }

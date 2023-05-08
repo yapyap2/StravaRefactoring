@@ -14,9 +14,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StravaService {
 
-    private final RideRepository repository;
-
     private final StravaApiClient client;
+
+    private final RideRepository rideRepository;
 
     public List<Ride> getRide(User user){
         int i = 1;
@@ -40,13 +40,11 @@ public class StravaService {
             } else {
                 rideList = client.getRide(user.getAccessToken(), i);
             }
-
             i++;
             for (Ride ride : rideList){
                 ride.setRideId(rideSeq);
                 rideSeq++;
             }
-
             if(rideList.isEmpty()){
                 break;
             }
@@ -57,7 +55,7 @@ public class StravaService {
 
         user.setLastUpdated(returnList.get(0).getStart_date_local());
 
-        repository.saveAll(returnList);
+        rideRepository.saveAll(returnList);
 
         return returnList;
     }

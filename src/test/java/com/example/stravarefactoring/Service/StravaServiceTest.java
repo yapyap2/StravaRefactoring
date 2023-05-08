@@ -15,6 +15,7 @@ import org.mockito.stubbing.Answer;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,8 +26,8 @@ import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 public class StravaServiceTest {
 
-    StravaService stravaService;
     RideRepository rideRepository;
+    StravaService stravaService;
     StravaApiClient client;
     Token token;
     List<Ride> rideList;
@@ -38,10 +39,10 @@ public class StravaServiceTest {
 
     @BeforeEach
     public void before() throws IOException {
-        rideRepository = mock(RideRepository.class);
         client = mock(StravaApiClient.class);
+        rideRepository = mock(RideRepository.class);
 
-        stravaService = new StravaService(rideRepository, client);
+        stravaService = new StravaService(client, rideRepository);
 
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -81,19 +82,18 @@ public class StravaServiceTest {
 
         when(client.getRide(any(String.class), any(Integer.class))).thenAnswer(answer);
 
-        stravaService.getRide(user);
-        ArgumentCaptor<List<Ride>> captor = ArgumentCaptor.forClass(List.class);
-        verify(rideRepository).saveAll(captor.capture());
+        List<Ride> rides = stravaService.getRide(user);
 
-        assertEquals("size", captor.getValue().size(), 30);
-        assertEquals("name", captor.getValue().get(0).getName(), "KNU 200 Brevet");
+
+        assertEquals("size",11,  rides.size());
+        assertEquals("name", "KNU 200 Brevet", rides.get(0).getName());
     }
 
     @Test
     public void updateRideTest(){
         initializeUser();
 
-        user.setRides(beforeRidelist);
+        user.setLastUpdated(beforeRidelist.get(0).getStart_date_local());
 
         Answer<List<Ride>> answer = new Answer<List<Ride>>() {
             int count = 1;
@@ -107,13 +107,11 @@ public class StravaServiceTest {
             }
         };
 
-        when(client.getRide(any(String.class), any(Integer.class))).thenAnswer(answer);
+        when(client.getOneRide(any(String.class))).thenReturn(List.of(afterRideList.get(0)));
+        when(client.getRideAfter(any(String.class), any(Integer.class), any(LocalDateTime.class))).thenAnswer(answer);
 
-        stravaService.getRide(user);
-        ArgumentCaptor<List<Ride>> captor = ArgumentCaptor.forClass(List.class);
-        verify(rideRepository).saveAll(captor.capture());
+        List<Ride> saveList = stravaService.getRide(user);
 
-        List<Ride> saveList = captor.getValue();
 
         assertTrue("dateTime", saveList.get(saveList.size() - 1).getStart_date_local().isAfter(beforeRidelist.get(0).getStart_date_local()));
     }

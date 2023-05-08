@@ -2,7 +2,7 @@ package com.example.stravarefactoring.Service;
 
 import com.example.stravarefactoring.DTO.*;
 import com.example.stravarefactoring.Repository.RideRepository;
-import com.example.stravarefactoring.StravaApiClient;
+import com.example.stravarefactoring.Repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -14,23 +14,18 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 import java.io.File;
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-
-
-
 @SpringBootTest
-public class StravaServiceTestWithSpring {
+public class UserServiceTestWithSpring {
+
     @Autowired
-    StravaService stravaService;
+    UserService userService;
+    @Autowired
+    UserRepository userRepository;
     @Autowired
     RideRepository rideRepository;
-    @Autowired
-    StravaApiClient client;
 
     Token token;
     List<Ride> beforeRideList;
@@ -58,38 +53,27 @@ public class StravaServiceTestWithSpring {
     }
 
     @Test
-    public void rideGetTest(){
-        List<Ride> rides = stravaService.getRide(user);
+    public void addNewUserTest(){
 
-        rides.forEach(r -> System.out.println(r));
+        User user = userService.addUser("014aed5fd692c48510bf63af7b8c9191fbf87cbb");
+
+        User getUser = userRepository.findUserById(user.getId());
+        List<Ride> list = rideRepository.findAllByUserId(user.getId());
+
+        assertEquals(user.getId(), getUser.getId());
+        assertEquals(user.getRides().size(), list.size());
+
+        System.out.println(list.get(0).toString());
     }
 
     @Test
-    public void updateRideTest(){
-
-        LocalDateTime dateTime = LocalDateTime.parse("2022-12-01 00:00:00", DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
-
-        user.setLastUpdated(dateTime);
-
-        List<Ride> rides = stravaService.getRide(user);
+    public void existUserAddTest(){
 
 
-        assertTrue(rides.get(rides.size() - 1).getStart_date_local().isAfter(dateTime));
-        assertTrue(user.getLastUpdated().isAfter(dateTime));
+
     }
 
 
-    @Test
-    public void getRideExceptionTest(){
 
-        Ride ride = client.getOneRide(user.getAccessToken()).get(0);
-
-        user.setLastUpdated(ride.getStart_date_local());
-
-        Exception exception = assertThrows(NoUpdateDataException.class, () ->
-                stravaService.getRide(user));
-
-        exception.printStackTrace();
-    }
 
 }

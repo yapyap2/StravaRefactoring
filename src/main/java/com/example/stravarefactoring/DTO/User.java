@@ -1,10 +1,7 @@
 package com.example.stravarefactoring.DTO;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -80,7 +77,7 @@ public class User {
     @JsonIgnore
     private int rideSeq;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId")
     private List<Ride> rides = new ArrayList<>();
 
     public void addRide(List<Ride> rideList){

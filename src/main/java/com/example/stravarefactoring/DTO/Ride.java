@@ -8,9 +8,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
-import org.springframework.beans.factory.annotation.Autowire;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -24,9 +21,8 @@ public class Ride {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
+    private int userId;
 
-    @Column(name = "user_id")
-    private Integer userId;
     private int rideId;
 
     public String name;

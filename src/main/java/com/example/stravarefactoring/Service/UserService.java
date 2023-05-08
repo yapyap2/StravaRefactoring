@@ -21,7 +21,6 @@ public class UserService {
     private final StravaApiClient stravaApiClient;
     private final StravaService stravaService;
 
-    @Transactional
     public User addUser(String code){
         Token token = stravaApiClient.getToken(code);
 
@@ -45,15 +44,14 @@ public class UserService {
         }
         try {
             List<Ride> rideList = stravaService.getRide(user);
-            userRepository.save(user);
-
+            userRepository.save(user); // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
             user.addRide(rideList);
         } catch (NoUpdateDataException e){
             e.printStackTrace();
             userRepository.save(user);
             return user;
         }
-        return user;
+         return user;
     }
 
     public User getUser(int id){
