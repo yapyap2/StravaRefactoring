@@ -19,10 +19,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.util.AssertionErrors.assertEquals;
-import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 public class StravaServiceTest {
 
@@ -85,8 +85,8 @@ public class StravaServiceTest {
         List<Ride> rides = stravaService.getRide(user);
 
 
-        assertEquals("size",11,  rides.size());
-        assertEquals("name", "KNU 200 Brevet", rides.get(0).getName());
+        assertEquals(11,  rides.size());
+        assertEquals("KNU 200 Brevet", rides.get(0).getName());
     }
 
     @Test
@@ -113,7 +113,57 @@ public class StravaServiceTest {
         List<Ride> saveList = stravaService.getRide(user);
 
 
-        assertTrue("dateTime", saveList.get(saveList.size() - 1).getStart_date_local().isAfter(beforeRidelist.get(0).getStart_date_local()));
+        assertTrue(saveList.get(saveList.size() - 1).getStart_date_local().isAfter(beforeRidelist.get(0).getStart_date_local()));
+    }
+
+
+    @Test
+    public void rideSaveTest(){
+
+        initializeUser();
+        Answer<List<Ride>> beforeAnswer = new Answer<List<Ride>>() {
+            int count = 1;
+            @Override
+            public List<Ride> answer(InvocationOnMock invocation) throws Throwable {
+                if(count == 1) {
+                    count++;
+                    return beforeRidelist;
+                }
+                else return new ArrayList<>();
+            }
+        };
+        when(client.getRide(any(String.class), any(Integer.class))).thenAnswer(beforeAnswer);
+
+        stravaService.getRide(user);
+        ArgumentCaptor<List<Ride>> captor = ArgumentCaptor.forClass(List.class);
+
+        Answer<List<Ride>> afterAnswer = new Answer<List<Ride>>() {
+            int count = 1;
+            @Override
+            public List<Ride> answer(InvocationOnMock invocation) throws Throwable {
+                if(count == 1) {
+                    count++;
+                    return afterRideList;
+                }
+                else return new ArrayList<>();
+            }
+        };
+        when(client.getRideAfter(any(String.class), any(Integer.class), any(LocalDateTime.class))).thenAnswer(afterAnswer);
+        when(client.getOneRide(any(String.class))).thenReturn(List.of(afterRideList.get(0)));
+
+
+        stravaService.getRide(user);
+
+        verify(rideRepository, times(2)).saveAll(captor.capture());
+
+
+        List<Ride> before = captor.getAllValues().get(0);
+        List<Ride> after = captor.getAllValues().get(1);
+
+
+        assertTrue(before.get(0).getStart_date_local().isBefore(after.get(0).getStart_date_local()));
+        assertTrue(user.getUpdate_at().isAfter(before.get(0).getStart_date_local()));
+
     }
 
 

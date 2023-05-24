@@ -25,7 +25,11 @@ dependencies {
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     compileOnly 'org.projectlombok:lombok'
-    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    // https://mvnrepository.com/artifact/mysql/mysql-connector-java
+    implementation group: 'mysql', name: 'mysql-connector-java', version: '8.0.28'
+
+
     implementation group: 'org.mariadb.jdbc', name: 'mariadb-java-client', version: '2.7.4'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'

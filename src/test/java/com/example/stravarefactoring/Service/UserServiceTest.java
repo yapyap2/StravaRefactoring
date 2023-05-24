@@ -16,6 +16,7 @@ import org.mockito.MockitoAnnotations;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -27,6 +28,7 @@ public class UserServiceTest {
     Token token;
     UserInfo userInfo;
     UserStatus userStatus;
+    User user;
     @Mock
     StravaApiClient client;
     UserService userService;
@@ -66,6 +68,13 @@ public class UserServiceTest {
         when(client.getUserStatus(any(Token.class))).thenReturn(userStatus);
         when(stravaService.getRide(any(User.class))).thenReturn(rideList);
     }
+
+    private void makeUser(){
+        user = new User(token);
+        user.setUserStatus(userStatus);
+        user.setUserInfo(userInfo);
+    }
+
     @Test
     public void addNewUserTest(){
         mocking();
@@ -78,6 +87,37 @@ public class UserServiceTest {
 
         assertEquals(userInfo.getId(), captor.getValue().getId());
         assertFalse(captor.getValue().getRides().isEmpty());
+    }
+
+    @Test
+    public void duplicatedUserNoUpdateTest(){
+
+        mocking();
+        makeUser();
+
+        when(userRepository.findUserById(anyInt())).thenReturn(user);
+
+        String modifiedName = "modifiedName";
+        String modifiedBio = "modifiedBio";
+
+        userInfo.setUpdate_at(LocalDateTime.now());
+        userInfo.setBio(modifiedBio);
+        userInfo.setName(modifiedName);
+
+        when(client.getUserInfo(any(Token.class))).thenReturn(userInfo);
+        when(stravaService.getRide(any(User.class))).thenThrow(new NoUpdateDataException("no update"));
+
+        userService.addUser(anyString());
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        verify(userRepository, times(1)).save(captor.capture());
+
+        User modifiedUser = captor.getValue();
+
+        assertEquals(modifiedUser.getBio(), modifiedBio);
+        assertEquals(modifiedUser.getName(), modifiedName);
+
     }
 
 }
