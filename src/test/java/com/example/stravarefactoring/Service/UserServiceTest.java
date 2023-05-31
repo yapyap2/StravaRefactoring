@@ -2,6 +2,7 @@ package com.example.stravarefactoring.Service;
 
 
 import com.example.stravarefactoring.DTO.*;
+import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaApiClient;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -37,6 +38,9 @@ public class UserServiceTest {
     @Mock
     StravaService stravaService;
 
+    @Mock
+    RideRepository rideRepository;
+
     List<Ride> rideList;
     List<Ride> beforeRidelist;
     List<Ride> afterRideList;
@@ -45,7 +49,7 @@ public class UserServiceTest {
     public void before() throws IOException {
         MockitoAnnotations.openMocks(this);
 
-        userService = new UserService(userRepository, client, stravaService);
+        userService = new UserService(userRepository, client, stravaService, rideRepository);
 
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -59,6 +63,9 @@ public class UserServiceTest {
         rideList = objectMapper.readValue(new File("src/main/resources/static/activities.json"), new TypeReference<List<Ride>>() {});
         beforeRidelist = objectMapper.readValue(new File("src/main/resources/static/beforeActivity.json"), new TypeReference<List<Ride>>() {});
         afterRideList = objectMapper.readValue(new File("src/main/resources/static/afterActivity.json"), new TypeReference<List<Ride>>() {});
+
+        mocking();
+        makeUser();
 
     }
 
@@ -77,9 +84,8 @@ public class UserServiceTest {
 
     @Test
     public void addNewUserTest(){
-        mocking();
 
-        userService.addUser(anyString());
+        userService.addUser(any((Token.class)));
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
@@ -92,22 +98,20 @@ public class UserServiceTest {
     @Test
     public void duplicatedUserNoUpdateTest(){
 
-        mocking();
-        makeUser();
-
         when(userRepository.findUserById(anyInt())).thenReturn(user);
 
         String modifiedName = "modifiedName";
         String modifiedBio = "modifiedBio";
+        LocalDateTime time = LocalDateTime.now();
 
-        userInfo.setUpdate_at(LocalDateTime.now());
+        userInfo.setUpdate_at(time);
         userInfo.setBio(modifiedBio);
         userInfo.setName(modifiedName);
 
         when(client.getUserInfo(any(Token.class))).thenReturn(userInfo);
         when(stravaService.getRide(any(User.class))).thenThrow(new NoUpdateDataException("no update"));
 
-        userService.addUser(anyString());
+        userService.addUser(any(Token.class));
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
@@ -117,7 +121,36 @@ public class UserServiceTest {
 
         assertEquals(modifiedUser.getBio(), modifiedBio);
         assertEquals(modifiedUser.getName(), modifiedName);
+        assertEquals(modifiedUser.getUpdate_at(), time);
+    }
 
+    @Test
+    public void duplicatedUserUpdateTest(){
+
+        when(userRepository.findUserById(anyInt())).thenReturn(user);
+
+        Ride ride = new Ride();
+        ride.setRideId(99999);
+        ride.setUserId(userInfo.getId());
+        ride.setName("new ride for test");
+        LocalDateTime time = LocalDateTime.now();
+        ride.setStart_date_local(time);
+
+        when(client.getOneRide(anyString())).thenReturn(List.of(ride));
+
+        when(stravaService.getRide(any(User.class))).thenReturn(List.of(ride));
+
+        userService.addUser(any(Token.class));
+
+        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
+
+        verify(userRepository).save(captor.capture());
+
+        User capturedUser = captor.getValue();
+
+
+        assertEquals(1, capturedUser.getRides().size());
+        assertEquals(time, capturedUser.getLastUpdated());
     }
 
 }

@@ -40,20 +40,18 @@ public class StravaService {
             } else {
                 rideList = client.getRide(user.getAccessToken(), i);
             }
+            if(rideList.isEmpty()){
+                break;
+            }
             i++;
             for (Ride ride : rideList){
                 ride.setRideId(rideSeq);
                 rideSeq++;
             }
-            if(rideList.isEmpty()){
-                break;
-            }
             returnList.addAll(rideList);
         }
 
         user.setRideSeq(rideSeq);
-
-        user.setLastUpdated(returnList.get(0).getStart_date_local());
 
         rideRepository.saveAll(returnList);
 

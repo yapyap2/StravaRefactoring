@@ -33,6 +33,7 @@ public class User {
         this.friend_count = info.getFriend_count();
         this.update_at = info.getUpdate_at();
         this.profile = info.getProfile();
+        this.weight = info.getWeight();
     }
 
     public void setUserStatus(UserStatus status){
@@ -65,6 +66,8 @@ public class User {
     private String city;
     private int totalKudos;
     private String profile;
+
+    private double weight;
 
     private String avg50;
     private String avg100;

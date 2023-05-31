@@ -22,9 +22,13 @@ import java.net.URL;
 public class Controller {
     private final UserService userService;
 
+    private final StravaApiClient client;
+
     @GetMapping("/request")
     public User userRequest(@RequestParam("code") String code){
 
-        return userService.addUser(code);
+        Token token = client.getToken(code);
+
+        return userService.addUser(token);
     }
 }

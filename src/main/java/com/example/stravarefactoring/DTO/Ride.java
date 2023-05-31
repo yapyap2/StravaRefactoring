@@ -21,8 +21,8 @@ public class Ride {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
+    @JoinColumn(name = "user_id")
     private int userId;
-
     private int rideId;
 
     public String name;

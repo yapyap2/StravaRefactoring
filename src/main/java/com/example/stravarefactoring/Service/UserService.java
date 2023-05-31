@@ -4,6 +4,7 @@ import com.example.stravarefactoring.DTO.Ride;
 import com.example.stravarefactoring.DTO.Token;
 import com.example.stravarefactoring.DTO.User;
 import com.example.stravarefactoring.DTO.UserInfo;
+import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaApiClient;
 import jakarta.transaction.Transactional;
@@ -20,15 +21,17 @@ public class UserService {
     private final UserRepository userRepository;
     private final StravaApiClient stravaApiClient;
     private final StravaService stravaService;
+    private final RideRepository rideRepository;
 
-    public User addUser(String code){
-        Token token = stravaApiClient.getToken(code);
+    public User addUser(Token token){
 
         User user;
         UserInfo userInfo = stravaApiClient.getUserInfo(token);
+        token.setId(userInfo.getId());
 
 
         user = userRepository.findUserById(userInfo.getId());
+        List<Ride> list = rideRepository.findAllByUserId(userInfo.getId());
 
         if(user != null){
             user.setAccessToken(token.getAccess_token());
@@ -38,6 +41,7 @@ public class UserService {
             }
             try {
                 List<Ride> rideList = stravaService.getRide(user);
+                user.setLastUpdated(rideList.get(0).getStart_date_local());
                 userRepository.save(user); // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
                 user.addRide(rideList);
                 return user;
@@ -54,8 +58,9 @@ public class UserService {
         }
         try {
             List<Ride> rideList = stravaService.getRide(user);
-            userRepository.save(user); // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
+            user.setLastUpdated(rideList.get(0).getStart_date_local());
             user.addRide(rideList);
+            userRepository.save(user); // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
         } catch (NoUpdateDataException e){
             e.printStackTrace();
             userRepository.save(user);

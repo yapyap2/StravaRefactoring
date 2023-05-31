@@ -49,13 +49,12 @@ public class UserServiceTestWithSpring {
         user.setUserInfo(userInfo);
         user.setUserStatus(userStatus);
         user.setAccessToken("7b6c8b4903efd7541d3d02b8fcd46bb4319ae13c");
-
     }
 
     @Test
     public void addNewUserTest(){
 
-        User user = userService.addUser("014aed5fd692c48510bf63af7b8c9191fbf87cbb");
+        User user = userService.addUser(token);
 
         User getUser = userRepository.findUserById(user.getId());
         List<Ride> list = rideRepository.findAllByUserId(user.getId());

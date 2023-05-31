@@ -5,7 +5,8 @@ import com.example.stravarefactoring.DTO.UserStatus;
 public class ApiAddress {
 
     public static String stravaGetToken(String code){
-       return "https://www.strava.com/oauth/token?client_id=89942&client_secret=678d9e347c605e0d6a705b19db49d4ba379c9748&code=" + code + "&grant_type=authorization_code";
+       return "https://www.strava.com/oauth/token?client_id=89942&client_secret=678d9e347c605e0d6a705b19db49d4ba379c9748&code=" + code + "&grant_type=authorization_code"
+               + "&scope=read_all,profile:write,activity:write";
     }
     public static String athleteStatusApi(Integer id){
         return "https://www.strava.com/api/v3/athletes/" + id.toString() + "/stats";
