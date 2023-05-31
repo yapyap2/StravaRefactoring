@@ -21,8 +21,6 @@ public class UserService {
     private final UserRepository userRepository;
     private final StravaApiClient stravaApiClient;
     private final StravaService stravaService;
-    private final RideRepository rideRepository;
-
     @Transactional
     public User addUser(Token token){
 
