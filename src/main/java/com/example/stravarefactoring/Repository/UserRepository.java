@@ -1,6 +1,6 @@
 package com.example.stravarefactoring.Repository;
 
-import com.example.stravarefactoring.DTO.User;
+import com.example.stravarefactoring.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

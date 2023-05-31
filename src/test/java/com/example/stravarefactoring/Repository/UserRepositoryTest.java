@@ -1,6 +1,6 @@
 package com.example.stravarefactoring.Repository;
 
-import com.example.stravarefactoring.DTO.User;
+import com.example.stravarefactoring.domain.User;
 import com.example.stravarefactoring.StravaApiClient;
 import org.junit.Test;
 import org.junit.runner.RunWith;

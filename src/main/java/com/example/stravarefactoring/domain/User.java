@@ -1,4 +1,4 @@
-package com.example.stravarefactoring.DTO;
+package com.example.stravarefactoring.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
@@ -80,7 +80,7 @@ public class User {
     @JsonIgnore
     private int rideSeq;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
     private List<Ride> rides = new ArrayList<>();
 
     public void addRide(List<Ride> rideList){

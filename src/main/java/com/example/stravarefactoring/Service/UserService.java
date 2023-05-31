@@ -1,9 +1,9 @@
 package com.example.stravarefactoring.Service;
 
-import com.example.stravarefactoring.DTO.Ride;
-import com.example.stravarefactoring.DTO.Token;
-import com.example.stravarefactoring.DTO.User;
-import com.example.stravarefactoring.DTO.UserInfo;
+import com.example.stravarefactoring.domain.Ride;
+import com.example.stravarefactoring.domain.Token;
+import com.example.stravarefactoring.domain.User;
+import com.example.stravarefactoring.domain.UserInfo;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaApiClient;
@@ -23,6 +23,7 @@ public class UserService {
     private final StravaService stravaService;
     private final RideRepository rideRepository;
 
+    @Transactional
     public User addUser(Token token){
 
         User user;
@@ -31,7 +32,6 @@ public class UserService {
 
 
         user = userRepository.findUserById(userInfo.getId());
-        List<Ride> list = rideRepository.findAllByUserId(userInfo.getId());
 
         if(user != null){
             user.setAccessToken(token.getAccess_token());
@@ -42,8 +42,8 @@ public class UserService {
             try {
                 List<Ride> rideList = stravaService.getRide(user);
                 user.setLastUpdated(rideList.get(0).getStart_date_local());
-                userRepository.save(user); // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
                 user.addRide(rideList);
+                userRepository.save(user); // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
                 return user;
             } catch (NoUpdateDataException e){
                 e.printStackTrace();

@@ -1,4 +1,4 @@
-package com.example.stravarefactoring.DTO;
+package com.example.stravarefactoring.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -21,7 +21,6 @@ public class UserInfo {
     private String state;
     private String city;
     private String profile;
-
     private double weight;
     @JsonCreator
     public UserInfo(@JsonProperty("id") int id, @JsonProperty("firstname")String firstname, @JsonProperty("lastname") String lastname, @JsonProperty("follower_count") int follower_count, @JsonProperty("friend_count")int friend_count,@JsonProperty("created_at") LocalDateTime create_at,@JsonProperty("updated_at") LocalDateTime update_at,@JsonProperty("bio") String bio,@JsonProperty("country") String country,@JsonProperty("state") String state,@JsonProperty("city") String city,@JsonProperty("profile") String profile, @JsonProperty("weight") double weight) {

@@ -1,10 +1,10 @@
 package com.example.stravarefactoring.LearningTest;
 
 import com.example.stravarefactoring.ApiAddress;
-import com.example.stravarefactoring.DTO.Token;
-import com.example.stravarefactoring.DTO.User;
-import com.example.stravarefactoring.DTO.UserInfo;
-import com.example.stravarefactoring.DTO.UserStatus;
+import com.example.stravarefactoring.domain.Token;
+import com.example.stravarefactoring.domain.User;
+import com.example.stravarefactoring.domain.UserInfo;
+import com.example.stravarefactoring.domain.UserStatus;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -13,8 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.*;
-import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;

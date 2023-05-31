@@ -1,15 +1,13 @@
 package com.example.stravarefactoring;
 
-import com.example.stravarefactoring.DTO.Ride;
-import com.example.stravarefactoring.DTO.Token;
-import com.example.stravarefactoring.DTO.UserInfo;
-import com.example.stravarefactoring.DTO.UserStatus;
-import lombok.RequiredArgsConstructor;
+import com.example.stravarefactoring.domain.Ride;
+import com.example.stravarefactoring.domain.Token;
+import com.example.stravarefactoring.domain.UserInfo;
+import com.example.stravarefactoring.domain.UserStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.util.Collections;
 import java.util.List;

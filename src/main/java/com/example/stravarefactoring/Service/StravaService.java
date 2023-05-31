@@ -1,7 +1,7 @@
 package com.example.stravarefactoring.Service;
 
-import com.example.stravarefactoring.DTO.Ride;
-import com.example.stravarefactoring.DTO.User;
+import com.example.stravarefactoring.domain.Ride;
+import com.example.stravarefactoring.domain.User;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.StravaApiClient;
 import lombok.RequiredArgsConstructor;
@@ -15,9 +15,6 @@ import java.util.List;
 public class StravaService {
 
     private final StravaApiClient client;
-
-    private final RideRepository rideRepository;
-
     public List<Ride> getRide(User user){
         int i = 1;
         List<Ride> returnList = new ArrayList<>();
@@ -47,13 +44,12 @@ public class StravaService {
             for (Ride ride : rideList){
                 ride.setRideId(rideSeq);
                 rideSeq++;
+                ride.setUser(user);
             }
             returnList.addAll(rideList);
         }
 
         user.setRideSeq(rideSeq);
-
-        rideRepository.saveAll(returnList);
 
         return returnList;
     }

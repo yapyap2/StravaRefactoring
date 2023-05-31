@@ -1,7 +1,5 @@
 package com.example.stravarefactoring;
 
-import com.example.stravarefactoring.DTO.UserStatus;
-
 public class ApiAddress {
 
     public static String stravaGetToken(String code){

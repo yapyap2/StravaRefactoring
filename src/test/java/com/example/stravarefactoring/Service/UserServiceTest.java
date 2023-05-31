@@ -1,7 +1,7 @@
 package com.example.stravarefactoring.Service;
 
 
-import com.example.stravarefactoring.DTO.*;
+import com.example.stravarefactoring.domain.*;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaApiClient;
@@ -64,17 +64,14 @@ public class UserServiceTest {
         beforeRidelist = objectMapper.readValue(new File("src/main/resources/static/beforeActivity.json"), new TypeReference<List<Ride>>() {});
         afterRideList = objectMapper.readValue(new File("src/main/resources/static/afterActivity.json"), new TypeReference<List<Ride>>() {});
 
-        mocking();
-        makeUser();
-
-    }
-
-    private void mocking(){
         when(client.getToken(anyString())).thenReturn(token);
         when(client.getUserInfo(any(Token.class))).thenReturn(userInfo);
         when(client.getUserStatus(any(Token.class))).thenReturn(userStatus);
         when(stravaService.getRide(any(User.class))).thenReturn(rideList);
+        makeUser();
+
     }
+
 
     private void makeUser(){
         user = new User(token);
@@ -85,7 +82,7 @@ public class UserServiceTest {
     @Test
     public void addNewUserTest(){
 
-        userService.addUser(any((Token.class)));
+        userService.addUser(new Token());
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
@@ -111,7 +108,7 @@ public class UserServiceTest {
         when(client.getUserInfo(any(Token.class))).thenReturn(userInfo);
         when(stravaService.getRide(any(User.class))).thenThrow(new NoUpdateDataException("no update"));
 
-        userService.addUser(any(Token.class));
+        userService.addUser(new Token());
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 
@@ -131,7 +128,7 @@ public class UserServiceTest {
 
         Ride ride = new Ride();
         ride.setRideId(99999);
-        ride.setUserId(userInfo.getId());
+        ride.setUser(user);
         ride.setName("new ride for test");
         LocalDateTime time = LocalDateTime.now();
         ride.setStart_date_local(time);
@@ -140,7 +137,7 @@ public class UserServiceTest {
 
         when(stravaService.getRide(any(User.class))).thenReturn(List.of(ride));
 
-        userService.addUser(any(Token.class));
+        userService.addUser(new Token());
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
 

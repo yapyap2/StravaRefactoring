@@ -1,6 +1,6 @@
 package com.example.stravarefactoring.Service;
 
-import com.example.stravarefactoring.DTO.*;
+import com.example.stravarefactoring.domain.*;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -48,7 +48,9 @@ public class UserServiceTestWithSpring {
         user = new User(token);
         user.setUserInfo(userInfo);
         user.setUserStatus(userStatus);
-        user.setAccessToken("7b6c8b4903efd7541d3d02b8fcd46bb4319ae13c");
+        user.setAccessToken("7d97761f8f8e12ab719756b31518324240fc7228");
+
+        token.setAccess_token("fed72fddcad74f210653c0e99c38a268f388520e");
     }
 
     @Test
@@ -64,15 +66,4 @@ public class UserServiceTestWithSpring {
 
         System.out.println(list.get(0).toString());
     }
-
-    @Test
-    public void existUserAddTest(){
-
-
-
-    }
-
-
-
-
 }

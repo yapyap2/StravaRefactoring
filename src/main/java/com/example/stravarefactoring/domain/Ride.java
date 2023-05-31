@@ -1,7 +1,5 @@
-package com.example.stravarefactoring.DTO;
+package com.example.stravarefactoring.domain;
 
-import com.example.stravarefactoring.Annotation.RideConstructor;
-import com.example.stravarefactoring.Service.StravaService;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,15 +12,17 @@ import java.util.HashMap;
 
 @Data
 @Entity
-@ToString(exclude = {"map" ,"summary_polyline"})
+@ToString(exclude = {"map" ,"summary_polyline", "user"})
 public class Ride {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JsonIgnore
     private Long id;
+    @ManyToOne
     @JoinColumn(name = "user_id")
-    private int userId;
+    private User user;
+
     private int rideId;
 
     public String name;
@@ -49,9 +49,8 @@ public class Ride {
     public double average_speed;
 
     @JsonCreator
-    public Ride(@JsonProperty("athlete") HashMap<String, Object> athlete, @JsonProperty("name")String name, @JsonProperty("distance")double distance, @JsonProperty("moving_time")int moving_time, @JsonProperty("total_elevation_gain")double total_elevation_gain, @JsonProperty("start_date_local")LocalDateTime start_date_local, @JsonProperty("map")HashMap<String, Object> map, @JsonProperty("average_speed")double average_speed, @JsonProperty("kudos_count")int kudos_count, @JsonProperty("comment_count")int comment_count, @JsonProperty("total_photo_count")int total_photo_count, @JsonProperty("average_watts")int average_watts
+    public Ride(@JsonProperty("name")String name, @JsonProperty("distance")double distance, @JsonProperty("moving_time")int moving_time, @JsonProperty("total_elevation_gain")double total_elevation_gain, @JsonProperty("start_date_local")LocalDateTime start_date_local, @JsonProperty("map")HashMap<String, Object> map, @JsonProperty("average_speed")double average_speed, @JsonProperty("kudos_count")int kudos_count, @JsonProperty("comment_count")int comment_count, @JsonProperty("total_photo_count")int total_photo_count, @JsonProperty("average_watts")int average_watts
     ) {
-        this.userId = (int) athlete.get("id");
         this.name = name;
         this.distance = distance/ 1000;
         this.moving_time = moving_time;

@@ -1,4 +1,4 @@
-package com.example.stravarefactoring.DTO;
+package com.example.stravarefactoring.domain;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
