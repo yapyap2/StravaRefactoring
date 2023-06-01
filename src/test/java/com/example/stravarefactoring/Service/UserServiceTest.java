@@ -37,6 +37,8 @@ public class UserServiceTest {
     UserRepository userRepository;
     @Mock
     StravaService stravaService;
+    @Mock
+    LocationMapper locationMapper;
 
     List<Ride> rideList;
     List<Ride> beforeRidelist;
@@ -46,7 +48,7 @@ public class UserServiceTest {
     public void before() throws IOException {
         MockitoAnnotations.openMocks(this);
 
-        userService = new UserService(userRepository, client, stravaService);
+        userService = new UserService(userRepository, client, stravaService, locationMapper);
 
 
         ObjectMapper objectMapper = new ObjectMapper();

@@ -24,6 +24,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
     implementation 'org.junit.jupiter:junit-jupiter:5.8.1'
+    testImplementation 'org.testng:testng:7.1.0'
     compileOnly 'org.projectlombok:lombok'
 
     // https://mvnrepository.com/artifact/mysql/mysql-connector-java
@@ -45,8 +46,11 @@ dependencies {
 // https://mvnrepository.com/artifact/org.aspectj/aspectjweaver
     runtimeOnly group: 'org.aspectj', name: 'aspectjweaver', version: '1.9.19'
 
+    implementation 'com.google.maps:google-maps-services:2.2.0'
 
 
+    // https://mvnrepository.com/artifact/org.slf4j/slf4j-api
+    testAnnotationProcessor 'org.projectlombok:lombok'
 }
 
 tasks.named('test') {

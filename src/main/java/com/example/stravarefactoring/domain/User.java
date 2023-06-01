@@ -4,10 +4,13 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.collection.spi.PersistentSet;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
@@ -19,6 +22,14 @@ public class User {
         this.refreshToken = token.getRefresh_token();
         this.accessToken = token.getAccess_token();
         this.rideSeq = 1;
+    }
+
+    public User(Token token, UserInfo userInfo, UserStatus userStatus){
+        this.refreshToken = token.getRefresh_token();
+        this.accessToken = token.getAccess_token();
+        this.rideSeq = 1;
+        setUserInfo(userInfo);
+        setUserStatus(userStatus);
     }
 
     public void setUserInfo(UserInfo info){
@@ -84,13 +95,12 @@ public class User {
     private List<Ride> rides = new ArrayList<>();
 
     public void addRide(List<Ride> rideList){
+        lastUpdated = rideList.get(0).getStart_date_local();
         rides.addAll(0,rideList);
     }
-//
-//    @OneToMany(fetch = FetchType.EAGER, mappedBy = "userId")
-//    @Fetch(FetchMode.SELECT)
-//    private List<Location> location = new ArrayList<>();
-//
-//    @Transient
-//    private List<String> strLocation = new ArrayList<>();
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "LOCATION", joinColumns = @JoinColumn(name = "USER_ID"))
+    private Set<String> location = new HashSet<>();
+
 }

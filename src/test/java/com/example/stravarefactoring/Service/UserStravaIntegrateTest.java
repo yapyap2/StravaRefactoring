@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.sql.*;
@@ -21,13 +24,16 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.Assert.*;
 
 
 @SpringBootTest
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-public class UserStravaIntergrateTest {
+public class UserStravaIntegrateTest {
+    @Autowired
+    ApplicationContext applicationContext;
     Token token;
 
     @Autowired
@@ -98,5 +104,23 @@ public class UserStravaIntergrateTest {
 
     }
 
+    @Test
+    public void locationTest() throws InterruptedException {
+        ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean("MapperAsyncExecutor", ThreadPoolTaskExecutor.class);
+
+
+        User user1 = userService.addUser(token);
+
+        assertTrue(user1 != null);
+        assertTrue(user1.getRides().size() >= 0);
+
+        taskExecutor.getThreadPoolExecutor().shutdown();
+        taskExecutor.getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+
+        User findUser2 = userRepository.findUserById(user1.getId());
+
+
+        assertTrue(findUser2.getLocation().size() != 0);
+    }
 
 }
