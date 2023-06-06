@@ -8,6 +8,8 @@ import com.example.stravarefactoring.domain.UserStatus;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.google.maps.internal.PolylineEncoding;
+import com.google.maps.model.LatLng;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Answers;
@@ -17,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.List;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
@@ -166,4 +169,6 @@ public class StravaApiLearningTest {
 
         System.out.println(user);
     }
+
+
 }

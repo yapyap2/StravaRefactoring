@@ -21,6 +21,7 @@ public class Ride {
     private Long id;
     @ManyToOne
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 
     private int rideId;

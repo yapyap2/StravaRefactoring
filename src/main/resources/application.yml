@@ -26,8 +26,10 @@ spring:
     properties:
       hibernate:
         format_sql: true
+        jdbc:
+          batch_size: 10
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://yapdb.c7uknqplmcnk.ap-northeast-2.rds.amazonaws.com:3306/yaptrava?serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    url: jdbc:mysql://yapdb.c7uknqplmcnk.ap-northeast-2.rds.amazonaws.com:3306/yaptrava?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&rewriteBatchedStatements=true
     username: yapyap
     password: 1712wonwoo

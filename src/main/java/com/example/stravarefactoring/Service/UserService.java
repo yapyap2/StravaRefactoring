@@ -1,20 +1,16 @@
 package com.example.stravarefactoring.Service;
 
-import com.example.stravarefactoring.domain.Ride;
-import com.example.stravarefactoring.domain.Token;
-import com.example.stravarefactoring.domain.User;
-import com.example.stravarefactoring.domain.UserInfo;
 import com.example.stravarefactoring.Repository.RideRepository;
+import com.example.stravarefactoring.domain.*;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaApiClient;
+import com.example.stravarefactoring.exception.NoUpdateDataException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.collection.spi.PersistentSet;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -26,6 +22,9 @@ public class UserService {
     private final StravaApiClient stravaApiClient;
     private final StravaService stravaService;
     private final LocationMapper locationMapper;
+
+    private final RideRepository rideRepository;
+
     @Transactional
     public User addUser(Token token){
 
@@ -46,8 +45,7 @@ public class UserService {
                 List<Ride> rideList = stravaService.getRide(user);
                 user.addRide(rideList);
 
-                saveUser(user);
-
+                saveUser(user, rideList);
                 return user;
             } catch (NoUpdateDataException e){
                 e.printStackTrace();
@@ -59,11 +57,11 @@ public class UserService {
             user = new User(token, userInfo, stravaApiClient.getUserStatus(token));
         }
         try {
+            user = userRepository.save(user);             // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
             List<Ride> rideList = stravaService.getRide(user);
             user.addRide(rideList);
 
-            saveUser(user);
-
+            saveUser(user,rideList);
         } catch (NoUpdateDataException e){
             e.printStackTrace();
             userRepository.save(user);
@@ -76,12 +74,12 @@ public class UserService {
         return userRepository.findUserById(id);
     }
 
-    public void saveUser(User user){
-        CompletableFuture<HashSet<String>> future = locationMapper.getLocation(user.getRides());
-
+    public void saveUser(User user, List<Ride> list){
+        CompletableFuture<HashSet<String>> future = locationMapper.getLocation(list);
         future.thenAccept(set ->{
             user.getLocation().addAll(set);
-            userRepository.save(user); // 여기서 user select가 호출되는 이유는 식별자가 Null이 아니라 직접 설정해줬기 때문, 존재하는 식별자인지 한번 확인하는 과정임 Ride도 같이 불러와서 수정해야 함
+
+            userRepository.save(user);
         });
     }
 }

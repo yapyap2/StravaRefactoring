@@ -1,10 +1,11 @@
 package com.example.stravarefactoring.Service;
 
 
-import com.example.stravarefactoring.domain.*;
 import com.example.stravarefactoring.Repository.RideRepository;
+import com.example.stravarefactoring.domain.*;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaApiClient;
+import com.example.stravarefactoring.exception.NoUpdateDataException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,15 +41,18 @@ public class UserServiceTest {
     @Mock
     LocationMapper locationMapper;
 
+    @Mock
+    RideRepository rideRepository;
+
     List<Ride> rideList;
     List<Ride> beforeRidelist;
     List<Ride> afterRideList;
 
     @BeforeEach
-    public void before() throws IOException {
+    public void before() throws IOException, NoUpdateDataException {
         MockitoAnnotations.openMocks(this);
 
-        userService = new UserService(userRepository, client, stravaService, locationMapper);
+        userService = new UserService(userRepository, client, stravaService, locationMapper, rideRepository);
 
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -92,7 +96,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void duplicatedUserNoUpdateTest(){
+    public void duplicatedUserNoUpdateTest() throws NoUpdateDataException {
 
         when(userRepository.findUserById(anyInt())).thenReturn(user);
 
@@ -121,7 +125,7 @@ public class UserServiceTest {
     }
 
     @Test
-    public void duplicatedUserUpdateTest(){
+    public void duplicatedUserUpdateTest() throws NoUpdateDataException {
 
         when(userRepository.findUserById(anyInt())).thenReturn(user);
 
@@ -148,5 +152,6 @@ public class UserServiceTest {
         assertEquals(1, capturedUser.getRides().size());
         assertEquals(time, capturedUser.getLastUpdated());
     }
+
 
 }

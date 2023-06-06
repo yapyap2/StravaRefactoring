@@ -1,9 +1,12 @@
 package com.example.stravarefactoring.Service;
 
+import com.example.stravarefactoring.Repository.RideBatchRepository;
+import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.domain.Ride;
 import com.example.stravarefactoring.domain.User;
-import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.StravaApiClient;
+import com.example.stravarefactoring.exception.NoUpdateDataException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +18,11 @@ import java.util.List;
 public class StravaService {
 
     private final StravaApiClient client;
-    public List<Ride> getRide(User user){
+    private final RideBatchRepository rideBatchRepository;
+
+    private final RideRepository rideRepository;
+    @Transactional
+    public List<Ride> getRide(User user) throws NoUpdateDataException {
         int i = 1;
         List<Ride> returnList = new ArrayList<>();
         List<Ride> rideList;
@@ -50,6 +57,8 @@ public class StravaService {
         }
 
         user.setRideSeq(rideSeq);
+
+        rideRepository.saveAll(returnList);
 
         return returnList;
     }

@@ -39,7 +39,8 @@ public class LocationMapperTest {
     }
     List<Ride> rideList;
 
-    String polyline = "e|adF}lnfWlj@wjEgdBq{By~CcjBqk@saDk}@ovCae@euA`VcyAp_BkyBx~CgiBp~Co{HeTur@auBeYsq@i}@xbC}pIrfCamBkp@oeCnOmxDltBulHh_BatAlcFex@rq@eeDpW`GvpGuxBnq@tK~yA_sAxhCinGjsAew@jVx}@rcDieBjp@s~HjnBu|@byBdj@pBk~AprAwbAWieA_g@cQxf@uaFlaC|BhwBt_AfnGoi@hvC|dAtcEobCzfBhy@~|F_sA|LojAjsEtYdyAyu@hl@sbBtjKvvDbn@ot@li@bKxh@a~CxdEogJnfD|uEncAqN|_CdnCqDb_@j_B~eAsIdkDph@~v@ax@zdBtVniBqe@hnD{a@hdA}ShyFl^pcBzaB|j@x[|vAuPnw@|}Cb{L{CxdB~lEzzCn|A~Ap_EhvD|t@xcHt{HbzHpzClu@nuAbtAhj@fcDzhEbd@gi@fhA}b@Bdj@nf@c[rp@lR`pFvy@dhB}Efj@zl@hLzyFx{HlL~qApvE`hBb[z`Awl@pn@``D`}BpDloBfdEx~Br~Eb}HbeDvUlsAvz@byBxiHrbC~tAzv@aLbBlmApl@vgCv|DhWpwAd}AfIt_BlsAxvA{@jnCtbAlvEx}@xnBrp@ow@~gAh}Ap`DiVnpCjy@nvDfeGloCfiA{Y`kAe_AvXqqGwbBcuE`i@}rCdeC}T~iD}|Az}Cm~E`}DikBBskG_vBmmAzzAovAqj@_oBv~AufEyFkz@bzBajEqfAmJj~@ojBl{AbPpqBem@dr@iuGsHclAzt@u_@frEsgBk[qsChaCen@ab@cxEpnBecBumCspCbzAojGqFulDleA_o@fyAyVukAwnA|FaGgbB{oBolC}t@sk@_y@`Qtl@snDmQmbGssFkbBnWucAfeBg}AbdAkgBhK{aAvuCeaBm_AcwDd{A_wM`v@}bBmtAepAwLm}BgsAdOka@g}AmlAd@yr@_mAonBe`Bzf@cvCiuBi[i{ApeAihA{g@yxAh~@ahCyuF_YysCkn@wH_A_|DyeCsnB_L_aBqhCyw@wfGn{Aa_Ay\\\\gFiq@hnAobE{DopA_wA|EieBjx@eBpdAa{AzXaz@lkB}dBmN}zDtWyqAj`B}V_pH_`AwrCikEsnA}tAwHymAqbBedCuW|@g~@{bDQ_~BitAueBjoAeeCi~@s}Bfg@{pHm`Bys@et@sdAnoAaoB\\\\wiCm`B{qDll@alGuc@usBfuAyeBtyFutAkDm[mhEu{@rf@ph@|bBuq@tvC";
+    String polyline = "wsefFs|ujW{~@qXuc@ugA_SybAoTcVkCic@pM_oAuKw{@vFwKuSa[hEiUjMwVrKO|EfZjOud@`L`Mbx@`K|UyTrFlOjLmB~I_PlDuy@rZuW}BkThSmQdUrM_Ac[lI{OlfAu}@lLq[{CoLlAa]tKzGfLuO`EvLdIwG~g@gtBpu@sFdk@qVd`@mo@lr@y]lEiYfTzM~H__@p_Ath@vU}a@j^cBtJdOlKiOz^_AwCoh@zx@qH~Dgk@mL}Xvb@{y@bn@pIz_@wVrFiRvIe{@_u@yZcGwvBcRa_Ar`@{gAsP{eAe@{|@nJy`A`D_OpQ}H{Cu\\hWuQsVcn@pn@{jAuIud@h]svClc@cnA|MaLne@goBdd@c`@fM{l@}Fa_@cb@mh@_C_nApr@clApk@yh@bGuT_MyEyD`Ll[wn@jJmt@cHkj@nNs~@xp@i`AfGkb@}m@qj@hG}g@sAgXqg@cr@sMklAcTuHwqA}}Aav@iSiu@ggAgHeIaOMxEy`@fh@}rAoJuf@}K_IdL_KrA}w@`SsMfItIxRkzAmw@ux@mp@yRoKa~@iS{QiJrGhJ_Hq_@wh@lu@uQblAar@fe@zLt\\cUliAcvAuDog@pL_p@qJuJpGtA}F_QxLsBuRyL|x@uXpQdAcc@xQih@bDfMjD~DjGaMhBjGpPkHiArKhJaMvp@~Dvf@wm@n{@_w@lo@og@kLakA|q@cs@~LH`Nn\\n^wPpHua@qFk_@{]ed@gImKgRkaAwL{i@cq@_a@tAqq@aWaVi`AiaAze@}h@}b@gTkAsEgPr\\aOrRk^vGel@aUwm@lYse@nAa\\oZsUzf@ii@xAqPiHcGyVnT}V_DkIuTjJ_\\ct@wLg`@aZgKglA{Xur@yGgfA}VnH{KnV{G}\\sNq@yEmTy[~XoV}O}F~Lu`@D{l@cYkCg[oY|LaGm]gWvDaJqMxH_PoCkKqRlD?eTaV}FvGjJuMPsM~g@hR_K}Rfs@~LqDiXzg@oFd`@iHiE|FtKfIkHlBpNpKeCmm@lg@}ZlFqNmLes@nl@{g@vGapBcgA{]gl@g_@kXgnAg]oi@_p@kh@yIuyAs{@}_Dav@mUss@oQbW_ToIer@kgAaXrKqY{D}JoJ{UwrAoYc_@am@yWoRwr@zMw~@{k@irAefAaJgPkd@iiAkZs@uh@k\\|\\eFqGfDnI|GuG";
+
     @Test
     public void decodingTest(){
         List<LatLng> list = mapper.decode(polyline);
@@ -50,7 +51,7 @@ public class LocationMapperTest {
 
     @Test
     public void addressDecodingTest(){
-        mapper.getAddress(polyline);
+        mapper.getAddress(polyline).forEach(a -> System.out.println(a));
     }
 
 

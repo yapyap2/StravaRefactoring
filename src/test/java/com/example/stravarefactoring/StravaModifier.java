@@ -1,8 +1,17 @@
 package com.example.stravarefactoring;
 
 import com.example.stravarefactoring.domain.Token;
+import org.junit.jupiter.api.Test;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -14,13 +23,13 @@ public class StravaModifier {
     String userName = "yapyap";
     String pw = "1712wonwoo";
 
-    public Token getToken() throws SQLException, ClassNotFoundException {
+    public Token getToken(int i) throws SQLException, ClassNotFoundException {
         Token token = new Token();
         Class.forName("com.mysql.cj.jdbc.Driver");
 
         Connection connection = DriverManager.getConnection(dbUrl, userName, pw);
 
-        String sql1 = "SELECT refresh_token, id from testToken";
+        String sql1 = "SELECT refresh_token, id from testToken where id = " + Integer.toString(i);
 
         Statement stateMent = connection.createStatement();
         ResultSet resultSet = stateMent.executeQuery(sql1);
@@ -50,6 +59,8 @@ public class StravaModifier {
         ps.setString(2, token.getRefresh_token());
         ps.setInt(3, id);
 
+        ps.executeUpdate();
+
         return token;
     }
 
@@ -71,5 +82,4 @@ public class StravaModifier {
                 .toBodilessEntity()
                 .block();
     }
-
 }

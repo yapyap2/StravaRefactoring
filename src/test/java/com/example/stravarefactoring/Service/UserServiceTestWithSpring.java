@@ -48,9 +48,9 @@ public class UserServiceTestWithSpring {
         user = new User(token);
         user.setUserInfo(userInfo);
         user.setUserStatus(userStatus);
-        user.setAccessToken("7d97761f8f8e12ab719756b31518324240fc7228");
+        user.setAccessToken("9a10a1187c3be7e19f9fbc21898258f67de60c85");
 
-        token.setAccess_token("fed72fddcad74f210653c0e99c38a268f388520e");
+        token.setAccess_token("9a10a1187c3be7e19f9fbc21898258f67de60c85");
     }
 
     @Test

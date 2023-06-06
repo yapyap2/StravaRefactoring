@@ -3,8 +3,10 @@ package com.example.stravarefactoring.Service;
 import com.example.stravarefactoring.domain.Ride;
 import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.LatLng;
+import io.netty.util.internal.StringUtil;
 import jakarta.persistence.Index;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -20,7 +22,7 @@ public class LocationMapper {
 
     @Async("MapperAsyncExecutor")
     public CompletableFuture<HashSet<String>> getLocation(List<Ride> rideList){
-
+        int userId = rideList.get(0).getUser().getId();
         log.info("{} mapper running. userID : {}", Thread.currentThread().getName(), rideList.get(0).getId());
 
         HashSet<String> returnSet = new HashSet<>();
@@ -28,9 +30,17 @@ public class LocationMapper {
         for(Ride ride : rideList){
             String polyline = ride.getSummary_polyline();
             if(polyline.equals("")) continue;
+            HashSet<String> location;
+            try {
+                location = getAddress(polyline);
+            } catch (RuntimeException e){
+                e.printStackTrace();
+                continue;
+            }
 
-            HashSet<String> location = getAddress(polyline);
+
             returnSet.addAll(location);
+            log.info("{} end", ride.getName());
         }
         return CompletableFuture.completedFuture(returnSet);
     }
@@ -55,7 +65,7 @@ public class LocationMapper {
 
                 document = returnData.get("documents").get(0);
 
-            }catch (IndexOutOfBoundsException e){
+            }catch (RuntimeException e){
                 continue;
             }
 
@@ -68,7 +78,12 @@ public class LocationMapper {
 
     public List<LatLng> decode(String polyline){
         String newEncodedString = polyline.replace("\\\\", "\\");
-        List<LatLng> decoded = PolylineEncoding.decode(newEncodedString);
+        List<LatLng> decoded;
+        try{
+            decoded = PolylineEncoding.decode(newEncodedString);
+        } catch (StringIndexOutOfBoundsException e){
+            throw new RuntimeException(e);
+        }
 
         return decoded;
     }

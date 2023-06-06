@@ -91,7 +91,7 @@ public class User {
     @JsonIgnore
     private int rideSeq;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user", cascade = {CascadeType.MERGE, CascadeType.PERSIST})
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
     private List<Ride> rides = new ArrayList<>();
 
     public void addRide(List<Ride> rideList){

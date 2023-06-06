@@ -1,8 +1,10 @@
 package com.example.stravarefactoring.Service;
 
+import com.example.stravarefactoring.Repository.RideBatchRepository;
 import com.example.stravarefactoring.domain.*;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.StravaApiClient;
+import com.example.stravarefactoring.exception.NoUpdateDataException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +44,7 @@ public class StravaServiceTest {
         client = mock(StravaApiClient.class);
         rideRepository = mock(RideRepository.class);
 
-        stravaService = new StravaService(client);
+        stravaService = new StravaService(client,mock(RideBatchRepository.class), mock(RideRepository.class));
 
 
         ObjectMapper objectMapper = new ObjectMapper();
@@ -65,7 +67,7 @@ public class StravaServiceTest {
     }
 
     @Test
-    public void getRideTest(){
+    public void getRideTest() throws NoUpdateDataException {
         initializeUser();
 
         Answer<List<Ride>> answer = new Answer<List<Ride>>() {
@@ -90,7 +92,7 @@ public class StravaServiceTest {
     }
 
     @Test
-    public void updateRideTest(){
+    public void updateRideTest() throws NoUpdateDataException {
         initializeUser();
 
         user.setLastUpdated(beforeRidelist.get(0).getStart_date_local());
