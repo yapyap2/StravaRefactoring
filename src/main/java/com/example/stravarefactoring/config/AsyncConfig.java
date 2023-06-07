@@ -19,4 +19,14 @@ public class AsyncConfig {
         executor.initialize();
         return executor;
     }
+
+    @Bean("TestAsyncExecutor")
+    public Executor testAsyncExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(5);
+        executor.setMaxPoolSize(10);
+        executor.setThreadNamePrefix("test-");
+        executor.initialize();
+        return executor;
+    }
 }

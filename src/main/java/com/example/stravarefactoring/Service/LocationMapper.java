@@ -3,8 +3,6 @@ package com.example.stravarefactoring.Service;
 import com.example.stravarefactoring.domain.Ride;
 import com.google.maps.internal.PolylineEncoding;
 import com.google.maps.model.LatLng;
-import io.netty.util.internal.StringUtil;
-import jakarta.persistence.Index;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.springframework.scheduling.annotation.Async;
@@ -80,7 +78,7 @@ public class LocationMapper {
         String newEncodedString = polyline.replace("\\\\", "\\");
         List<LatLng> decoded;
         try{
-            decoded = PolylineEncoding.decode(newEncodedString);
+            decoded = decodeProcess(newEncodedString);
         } catch (StringIndexOutOfBoundsException e){
             throw new RuntimeException(e);
         }
@@ -118,5 +116,46 @@ public class LocationMapper {
         }
 
         return avgLatLng;
+    }
+
+
+    public List<LatLng> decodeProcess(String encodedPath) {
+
+        int len = encodedPath.length();
+
+        final List<LatLng> path = new ArrayList<>(len / 2);
+        int index = 0;
+        int lat = 0;
+        int lng = 0;
+
+        while (index < len) {
+            int result = 1;
+            int shift = 0;
+            int b;
+
+            try {
+                do {
+                    b = encodedPath.charAt(index++) - 63 - 1;
+                    result += b << shift;
+                    shift += 5;
+                } while (b >= 0x1f);
+                lat += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+                result = 1;
+                shift = 0;
+                do {
+                    b = encodedPath.charAt(index++) - 63 - 1;
+                    result += b << shift;
+                    shift += 5;
+                } while (b >= 0x1f);
+                lng += (result & 1) != 0 ? ~(result >> 1) : (result >> 1);
+
+                path.add(new LatLng(lat * 1e-5, lng * 1e-5));
+            } catch (StringIndexOutOfBoundsException e){
+                log.info("String out of index");
+            }
+        }
+
+        return path;
     }
 }

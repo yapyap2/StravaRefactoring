@@ -149,7 +149,7 @@ public class UserStravaIntegrateTest {
     @Test
     @Transactional
     public void locationTest() throws SQLException, ClassNotFoundException {
-        token = stravaModifier.getToken(1);
+        token = stravaModifier.getToken(2);
 
         User user1 = userService.addUser(token);
         entityManager.detach(user1);
