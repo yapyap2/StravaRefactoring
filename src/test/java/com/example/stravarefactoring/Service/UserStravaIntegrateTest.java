@@ -61,7 +61,7 @@ public class UserStravaIntegrateTest {
     @Autowired
     private RideRepository rideRepository;
     @Autowired
-    private LocationMapper locationMapper;
+    private ParallelLocationMapper locationMapper;
     @Autowired
     private StravaApiClient client;
 

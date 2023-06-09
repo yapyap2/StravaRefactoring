@@ -13,8 +13,7 @@ public class AsyncConfig {
     @Bean("MapperAsyncExecutor")
     public Executor customAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
+        executor.setCorePoolSize(2);
         executor.setThreadNamePrefix("mapper-");
         executor.initialize();
         return executor;
@@ -23,8 +22,12 @@ public class AsyncConfig {
     @Bean("TestAsyncExecutor")
     public Executor testAsyncExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(5);
-        executor.setMaxPoolSize(10);
+        executor.setCorePoolSize(1);
+        executor.setQueueCapacity(1);
+
+        executor.setAllowCoreThreadTimeOut(true);
+        executor.setKeepAliveSeconds(5);
+
         executor.setThreadNamePrefix("test-");
         executor.initialize();
         return executor;

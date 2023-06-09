@@ -36,7 +36,7 @@ public class MultiProcessTest {
             parameter.add(i);
         }
 
-        CompletableFuture<List<String>> future = target.processing(parameter);
+        CompletableFuture<List<String>> future = target.processing(parameter, 1);
         log.info("processing started....");
 
         taskExecutor.getThreadPoolExecutor().shutdown();
@@ -65,5 +65,106 @@ public class MultiProcessTest {
 
         future.thenAccept(list -> list.forEach(i -> System.out.println(i)));
     }
+
+    @Test
+    public void multiUserParallelTest() throws InterruptedException {
+        ThreadPoolTaskExecutor taskExecutor = context.getBean("TestAsyncExecutor", ThreadPoolTaskExecutor.class);
+
+        List<Integer> parameter1 = new ArrayList<>();
+
+        for (int i = 1; i <= size; i++) {
+            parameter1.add(i);
+        }
+        List<Integer> parameter2 = new ArrayList<>();
+        for (int i = size + 1; i <= size * 2; i++) {
+            parameter2.add(i);
+        }
+        List<Integer> parameter3 = new ArrayList<>();
+        for (int i = size * 2 + 1; i <= size * 3; i++) {
+            parameter3.add(i);
+        }
+
+
+        CompletableFuture<List<String>> result1 = target.processing(parameter1, 1);
+        log.info("1   processing started....");
+        CompletableFuture<List<String>> result2 = target.processing(parameter2, 2);
+        log.info("2   processing started....");
+        CompletableFuture<List<String>> result3 = target.processing(parameter3, 3);
+        log.info("3   processing started....");
+
+
+        taskExecutor.getThreadPoolExecutor().shutdown();
+        taskExecutor.getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+    }
+
+
+    @Test
+    public void maxQueueTest() throws InterruptedException {
+        ThreadPoolTaskExecutor taskExecutor = context.getBean("TestAsyncExecutor", ThreadPoolTaskExecutor.class);
+
+        List<Integer> parameter1 = new ArrayList<>();
+
+        for (int i = 1; i <= size; i++) {
+            parameter1.add(i);
+        }
+
+
+        CompletableFuture<List<String>> result1 = target.processing(parameter1, 1);
+        CompletableFuture<List<String>> result2 = target.processing(parameter1, 2);
+        log.info("1, 2   processing started. now coreThread is full");
+
+        CompletableFuture<List<String>> result3 = target.processing(parameter1, 3);
+        log.info("3   processing started. now queue is full");
+
+        target.processing(parameter1, 4);
+        target.processing(parameter1, 5);
+        log.info("4,5 processing started");
+
+
+        taskExecutor.getThreadPoolExecutor().shutdown();
+        taskExecutor.getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+    }
+
+
+    @Test
+    public void threadTimeOutTest() throws InterruptedException {
+        ThreadPoolTaskExecutor taskExecutor = context.getBean("TestAsyncExecutor", ThreadPoolTaskExecutor.class);
+
+        List<Integer> parameter1 = new ArrayList<>();
+
+        for (int i = 1; i <= size; i++) {
+            parameter1.add(i);
+        }
+
+        System.out.println(taskExecutor.getActiveCount() + "/" + taskExecutor.getCorePoolSize() + "   " + taskExecutor.getPoolSize() + "   " + taskExecutor.getQueueSize());
+
+        target.processing(parameter1, 1);
+        target.processing(parameter1, 2);
+
+        System.out.println(taskExecutor.getActiveCount() + "/" + taskExecutor.getCorePoolSize() + "   " + taskExecutor.getPoolSize() + "   " + taskExecutor.getQueueSize());
+
+
+        target.processing(parameter1, 3);
+
+        System.out.println(taskExecutor.getActiveCount() + "/" + taskExecutor.getCorePoolSize() + "   " + taskExecutor.getPoolSize() + "   " + taskExecutor.getQueueSize());
+
+        Thread.sleep(15000);
+
+        System.out.println(taskExecutor.getActiveCount() + "/" + taskExecutor.getCorePoolSize() + "   " + taskExecutor.getPoolSize() + "   " + taskExecutor.getQueueSize());
+
+        target.processing(parameter1, 4);
+
+        System.out.println(taskExecutor.getActiveCount() + "/" + taskExecutor.getCorePoolSize() + "   " + taskExecutor.getPoolSize() + "   " + taskExecutor.getQueueSize());
+
+
+
+        taskExecutor.getThreadPoolExecutor().shutdown();
+        taskExecutor.getThreadPoolExecutor().awaitTermination(Long.MAX_VALUE, TimeUnit.HOURS);
+    }
+
+
+
+
+
 
 }

@@ -20,6 +20,9 @@ public class LocationMapper {
 
     @Async("MapperAsyncExecutor")
     public CompletableFuture<HashSet<String>> getLocation(List<Ride> rideList){
+        double averageTime = 0L;
+        double processingTime = 0L;
+
         int userId = rideList.get(0).getUser().getId();
         log.info("{} mapper running. userID : {}", Thread.currentThread().getName(), rideList.get(0).getId());
 
@@ -30,16 +33,22 @@ public class LocationMapper {
             if(polyline.equals("")) continue;
             HashSet<String> location;
             try {
+                Long beforeTime = System.nanoTime();
                 location = getAddress(polyline);
+                Long afterTime = System.nanoTime();
+                processingTime = afterTime - beforeTime;
+                averageTime += processingTime;
+
             } catch (RuntimeException e){
                 e.printStackTrace();
                 continue;
             }
 
-
             returnSet.addAll(location);
-            log.info("{} end", ride.getName());
+            log.info("{} end.   processing time : {}", ride.getName(), processingTime);
         }
+
+        log.info("location Mapping Complete.   average processing time per ride : {}", averageTime/rideList.size());
         return CompletableFuture.completedFuture(returnSet);
     }
 

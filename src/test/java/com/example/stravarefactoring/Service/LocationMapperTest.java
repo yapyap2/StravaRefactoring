@@ -26,6 +26,9 @@ public class LocationMapperTest {
     @Autowired
     LocationMapper mapper;
 
+    @Autowired
+    ParallelLocationMapper parallelLocationMapper;
+
     @BeforeEach
     public void before() throws IOException {
 
@@ -59,6 +62,23 @@ public class LocationMapperTest {
     public void asyncTest() throws InterruptedException {
 
         CompletableFuture<HashSet<String>> future = mapper.getLocation(rideList);
+
+        log.info("before forEach");
+
+        future.thenAccept(set -> set.forEach(s -> log.info("{} {}", Thread.currentThread().getName(), s)));
+
+        log.info("{} 20 sec timer start", Thread.currentThread().getName());
+
+        Thread.sleep(20000);
+
+        log.info("{} 20 sec timer end", Thread.currentThread().getName());
+
+    }
+
+    @Test
+    public void parallelLocationMapperTest() throws InterruptedException {
+
+        CompletableFuture<HashSet<String>> future = parallelLocationMapper.getLocation(rideList);
 
         log.info("before forEach");
 

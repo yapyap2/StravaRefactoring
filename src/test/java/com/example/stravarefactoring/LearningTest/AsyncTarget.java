@@ -16,18 +16,18 @@ public class AsyncTarget {
 
     Integer threadPoolSize = 10;
     Integer waitTime = 10;
+    Double assignmentSize = 5.0;
     BasicThreadFactory factory = new BasicThreadFactory.Builder().namingPattern("ThreadTest-%d").build();
     ExecutorService service = Executors.newFixedThreadPool(threadPoolSize, factory);
 
-    HashMap<String, Integer> map = new HashMap<>();
     @Async("TestAsyncExecutor")
-    public CompletableFuture<List<String>> processing(List<Integer> list){
+    public CompletableFuture<List<String>> processing(List<Integer> list, int number){
+        log.info("{} processing start       {}", Thread.currentThread().getName(), number);
 
-        for (int i = 1; i <= threadPoolSize; i++){
-            map.put("ThreadTest-" + Integer.toString(i), 0);
-        }
 
-        int segmentSize = 50;
+        double a = list.size() / assignmentSize;
+        int segmentSize = (int) Math.ceil(a);
+
         List<Callable<List<String>>> callables = new ArrayList<>();
 
         for(int i = 0; i < list.size(); i+=segmentSize){
@@ -35,18 +35,15 @@ public class AsyncTarget {
             try{
                 subList = list.subList(i, i + segmentSize);
             } catch (IndexOutOfBoundsException e){
-                subList = list.subList(i, list.size()-1);
+                subList = list.subList(i, list.size());
             }
 
             ParameterStruct parameterStruct = new ParameterStruct();
             parameterStruct.setList(subList);
             parameterStruct.setName(subList.get(0).toString() + "~" + subList.get(subList.size()-1).toString());
-            System.out.println(parameterStruct.getName() + " segment created");
             Callable<List<String>> callable = () -> multiProcessing(parameterStruct);
             callables.add(callable);
         }
-
-        System.out.println("total segment length " + callables.size());
 
         List<Future<List<String>>> futures;
         try {
@@ -65,7 +62,7 @@ public class AsyncTarget {
             }
         }
 
-        System.out.println(map.toString());
+        log.info("{} processing complete.   {}", Thread.currentThread().getName(), number);
 
         return CompletableFuture.completedFuture(returnList);
     }
@@ -74,9 +71,7 @@ public class AsyncTarget {
     public List<String> multiProcessing(ParameterStruct parameterStruct){
 
         List<String> returnList = new ArrayList<>();
-        System.out.println("parameter "  + parameterStruct.getName() + " is processed in " + Thread.currentThread().getName());
-
-        map.put(Thread.currentThread().getName(), map.get(Thread.currentThread().getName())+1);
+//        System.out.println("parameter "  + parameterStruct.getName() + " is processed in " + Thread.currentThread().getName());
 
         for(Integer i :parameterStruct.getList()){
 
@@ -89,7 +84,7 @@ public class AsyncTarget {
             returnList.add("Processed  /// " + String.valueOf(i) + "  ///   " + Thread.currentThread().getName());
         }
 
-        log.info("{} is now available ", Thread.currentThread().getName());
+//        log.info("{} is now available ", Thread.currentThread().getName());
         return returnList;
     }
 

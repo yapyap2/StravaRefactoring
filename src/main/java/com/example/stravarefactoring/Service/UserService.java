@@ -21,7 +21,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final StravaApiClient stravaApiClient;
     private final StravaService stravaService;
-    private final LocationMapper locationMapper;
+    private final ParallelLocationMapper locationMapper;
 
     private final RideRepository rideRepository;
 

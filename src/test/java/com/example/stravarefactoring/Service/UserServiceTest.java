@@ -39,7 +39,7 @@ public class UserServiceTest {
     @Mock
     StravaService stravaService;
     @Mock
-    LocationMapper locationMapper;
+    ParallelLocationMapper locationMapper;
 
     @Mock
     RideRepository rideRepository;
