@@ -1,6 +1,7 @@
 package com.example.stravarefactoring.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -62,26 +63,44 @@ public class User {
     private int id;
     private String name;
     private LocalDateTime lastUpdated;
+    @Nullable
     private double biggest_ride_distance;
+    @Nullable
     private double biggest_climb_elevation_gain;
+    @Nullable
     private double totalDistance;
+    @Nullable
     private double totalElevation;
+    @Nullable
     private double totalTime;
+    @Nullable
     private int follower_count;
+    @Nullable
     private int friend_count;
+    @Nullable
     private LocalDateTime create_at;
+    @Nullable
     private LocalDateTime update_at;
+    @Nullable
     private String bio;
+    @Nullable
     private String country;
+    @Nullable
     private String state;
+    @Nullable
     private String city;
+    @Nullable
     private int totalKudos;
+    @Nullable
     private String profile;
-
+    @Nullable
     private double weight;
 
+    @Nullable
     private String avg50;
+    @Nullable
     private String avg100;
+    @Nullable
     private boolean gosu;
 
 
@@ -89,9 +108,12 @@ public class User {
 //    private List<Ride> recentRides = new ArrayList<>();
 
     @JsonIgnore
+    @Nullable
+
     private int rideSeq;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @Nullable
     private List<Ride> rides = new ArrayList<>();
 
     public void addRide(List<Ride> rideList){
@@ -100,6 +122,7 @@ public class User {
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
+    @Nullable
     @CollectionTable(name = "LOCATION", joinColumns = @JoinColumn(name = "USER_ID"))
     private Set<String> location = new HashSet<>();
 

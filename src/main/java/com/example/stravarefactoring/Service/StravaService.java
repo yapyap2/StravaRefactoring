@@ -21,7 +21,6 @@ public class StravaService {
     private final RideBatchRepository rideBatchRepository;
 
     private final RideRepository rideRepository;
-    @Transactional
     public List<Ride> getRide(User user) throws NoUpdateDataException {
         int i = 1;
         List<Ride> returnList = new ArrayList<>();
@@ -58,7 +57,8 @@ public class StravaService {
 
         user.setRideSeq(rideSeq);
 
-        rideRepository.saveAll(returnList);
+        rideBatchRepository.saveAll(returnList);
+//        rideRepository.saveAll(returnList);
 
         return returnList;
     }

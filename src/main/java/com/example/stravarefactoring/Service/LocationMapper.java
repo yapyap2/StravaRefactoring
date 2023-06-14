@@ -24,7 +24,7 @@ public class LocationMapper {
         double processingTime = 0L;
 
         int userId = rideList.get(0).getUser().getId();
-        log.info("{} mapper running. userID : {}", Thread.currentThread().getName(), rideList.get(0).getId());
+        log.info("{} mapper running. userID : {}", Thread.currentThread().getName(), rideList.get(0).getUser().getId());
 
         HashSet<String> returnSet = new HashSet<>();
 

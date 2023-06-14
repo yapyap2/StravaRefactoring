@@ -37,8 +37,6 @@ public class LocationMapperTest {
         objectMapper.registerModule(new JavaTimeModule());
 
         rideList = objectMapper.readValue(new File("src/main/resources/static/activities.json"), new TypeReference<List<Ride>>() {});
-
-        rideList = rideList.subList(0, 5);
     }
     List<Ride> rideList;
 
@@ -78,7 +76,7 @@ public class LocationMapperTest {
     @Test
     public void parallelLocationMapperTest() throws InterruptedException {
 
-        CompletableFuture<HashSet<String>> future = parallelLocationMapper.getLocation(rideList);
+        CompletableFuture<HashSet<String>> future = mapper.getLocation(rideList);
 
         log.info("before forEach");
 
@@ -89,6 +87,16 @@ public class LocationMapperTest {
         Thread.sleep(20000);
 
         log.info("{} 20 sec timer end", Thread.currentThread().getName());
+
+    }
+
+    @Test
+    public void test() throws InterruptedException {
+
+        mapper.getLocation(rideList);
+
+
+        Thread.sleep(20000);
 
     }
 

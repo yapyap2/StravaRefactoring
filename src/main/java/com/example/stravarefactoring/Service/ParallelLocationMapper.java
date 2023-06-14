@@ -31,7 +31,7 @@ public class ParallelLocationMapper {
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
-        log.info("LocationMapper Start. userName : {}",name);
+        log.info("LocationMapper Start. userName : {} data size : {}",name, rideList.size());
 
         int segmentSize = (int) Math.ceil(rideList.size() / THREAD_ASSIGNMENT_SIZE);
 
@@ -73,7 +73,7 @@ public class ParallelLocationMapper {
 
         stopWatch.stop();
 
-        log.info("LocationMapper complete. userName : {}     processing time : {} ms",name, stopWatch.getTime());
+        log.info("LocationMapper complete. userName : {} processing time : {} ms SetSize : {}",name, stopWatch.getTime(), returnSet.size());
         return CompletableFuture.completedFuture(returnSet);
     }
 
@@ -94,7 +94,7 @@ public class ParallelLocationMapper {
                 } catch (StringIndexOutOfBoundsException e){
                     continue;
                 }
-                log.info("rideName {} complete. ", ride.getName());
+                log.info("rideName : {} complete. ", ride.getName());
                 hashSet.addAll(location);
             }
         } catch (Exception e){

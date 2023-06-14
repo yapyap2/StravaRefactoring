@@ -119,54 +119,6 @@ public class StravaServiceTest {
     }
 
 
-//    @Test
-//    public void rideSaveTest(){
-//
-//        initializeUser();
-//        Answer<List<Ride>> beforeAnswer = new Answer<List<Ride>>() {
-//            int count = 1;
-//            @Override
-//            public List<Ride> answer(InvocationOnMock invocation) throws Throwable {
-//                if(count == 1) {
-//                    count++;
-//                    return beforeRidelist;
-//                }
-//                else return new ArrayList<>();
-//            }
-//        };
-//        when(client.getRide(any(String.class), any(Integer.class))).thenAnswer(beforeAnswer);
-//
-//        stravaService.getRide(user);
-//        ArgumentCaptor<List<Ride>> captor = ArgumentCaptor.forClass(List.class);
-//
-//        Answer<List<Ride>> afterAnswer = new Answer<List<Ride>>() {
-//            int count = 1;
-//            @Override
-//            public List<Ride> answer(InvocationOnMock invocation) throws Throwable {
-//                if(count == 1) {
-//                    count++;
-//                    return afterRideList;
-//                }
-//                else return new ArrayList<>();
-//            }
-//        };
-//        when(client.getRideAfter(any(String.class), any(Integer.class), any(LocalDateTime.class))).thenAnswer(afterAnswer);
-//        when(client.getOneRide(any(String.class))).thenReturn(List.of(afterRideList.get(0)));
-//
-//
-//        stravaService.getRide(user);
-//
-//        verify(rideRepository, times(2)).saveAll(captor.capture());
-//
-//
-//        List<Ride> before = captor.getAllValues().get(0);
-//        List<Ride> after = captor.getAllValues().get(1);
-//
-//
-//        assertTrue(before.get(0).getStart_date_local().isBefore(after.get(0).getStart_date_local()));
-//        assertTrue(user.getUpdate_at().isAfter(before.get(0).getStart_date_local()));
-//
-//    }
 
 
 }

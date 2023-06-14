@@ -2,6 +2,7 @@ package com.example.stravarefactoring.Service;
 
 
 import com.example.stravarefactoring.Repository.RideRepository;
+import com.example.stravarefactoring.Repository.UserJDBCRepository;
 import com.example.stravarefactoring.domain.*;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaApiClient;
@@ -40,9 +41,11 @@ public class UserServiceTest {
     StravaService stravaService;
     @Mock
     ParallelLocationMapper locationMapper;
-
     @Mock
     RideRepository rideRepository;
+
+    @Mock
+    UserJDBCRepository userJDBCRepository;
 
     List<Ride> rideList;
     List<Ride> beforeRidelist;
@@ -52,7 +55,7 @@ public class UserServiceTest {
     public void before() throws IOException, NoUpdateDataException {
         MockitoAnnotations.openMocks(this);
 
-        userService = new UserService(userRepository, client, stravaService, locationMapper, rideRepository);
+        userService = new UserService(userRepository, client, stravaService, locationMapper);
 
 
         ObjectMapper objectMapper = new ObjectMapper();
