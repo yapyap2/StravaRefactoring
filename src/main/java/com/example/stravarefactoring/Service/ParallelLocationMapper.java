@@ -131,7 +131,13 @@ public class ParallelLocationMapper {
 
             HashMap<String, String> address = document.get("address");
 
-            hashSet.add(address.get("region_2depth_name"));
+            String l1 = address.get("region_1depth_name");
+            String l2 = address.get("region_2depth_name");
+            if(l2.contains(" ")){
+                l2 = l2.split(" ")[0];
+            }
+
+            hashSet.add(l1+l2);
         }
         return hashSet;
     }
