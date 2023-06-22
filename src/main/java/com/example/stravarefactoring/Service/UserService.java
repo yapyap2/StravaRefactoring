@@ -35,6 +35,8 @@ public class UserService {
         UserInfo userInfo = stravaApiClient.getUserInfo(token);
         token.setId(userInfo.getId());
 
+        log.info("incoming request   id : {}", token.getId());
+
 
         user = userRepository.findUserById(userInfo.getId());
 

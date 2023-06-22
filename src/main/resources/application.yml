@@ -37,3 +37,12 @@ spring:
 #    url: jdbc:mysql://localhost:3306/yaptrava?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999
     username: yapyap
     password: 1712wonwoo
+
+server:
+  ssl:
+    enabled: true
+    key-store: classpath:keystore.p12
+    key-store-password: 1712wonwoo
+    key-store-type: PKCS12
+    key-alias: 1
+  port: 8080
