@@ -37,6 +37,3 @@ out/
 .vscode/
 /src/main/resources/static/JSON/
 /src/main/resources/static/
-
-/src/main/resources/application.yml
-
