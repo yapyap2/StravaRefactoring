@@ -10,6 +10,8 @@ import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientException;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -19,14 +21,24 @@ import java.util.concurrent.*;
 public class ParallelLocationMapper {
     private final Integer THREAD_POOL_SIZE = 10;
     private final Double THREAD_ASSIGNMENT_SIZE = 5.0;
-
+    private Boolean available = true;
     WebClient webClient = WebClient.builder().build();
 
     BasicThreadFactory factory = new BasicThreadFactory.Builder().namingPattern("ThreadTest-%d").build();
     ExecutorService service = Executors.newFixedThreadPool(THREAD_POOL_SIZE, factory);
 
     @Async("MapperAsyncExecutor")
-    public CompletableFuture<HashSet<String>> getLocation(List<Ride> rideList){
+    public CompletableFuture<HashMap<String, Object>> getLocation(List<Ride> rideList){
+        if(!available){
+            log.info("LocationMapper is not available");
+            HashMap<String, Object> map = new HashMap<>();
+
+            map.put("status", "exception");
+            map.put("remain", rideList);
+            map.put("result", new HashSet<>());
+            return CompletableFuture.completedFuture(map);
+        }
+
         String name = rideList.get(0).getUser().getName();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
@@ -35,7 +47,7 @@ public class ParallelLocationMapper {
 
         int segmentSize = (int) Math.ceil(rideList.size() / THREAD_ASSIGNMENT_SIZE);
 
-        List<Callable<HashSet<String>>> callables = new ArrayList<>();
+        List<Callable<HashMap<String, Object>>> callables = new ArrayList<>();
 
         for(int i = 0; i < rideList.size(); i+=segmentSize){
             List<Ride> subList;
@@ -47,45 +59,46 @@ public class ParallelLocationMapper {
             }
 
             List<Ride> finalSubList = subList;
-            Callable<HashSet<String>> callable = () -> parallelProcessing(finalSubList);
+            Callable<HashMap<String, Object>> callable = () -> parallelProcessing(finalSubList);
 
             callables.add(callable);
         }
 
-        List<Future<HashSet<String>>> futures;
+        List<Future<HashMap<String, Object>>> futures;
         try {
             futures = service.invokeAll(callables);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
 
-        HashSet<String> returnSet = new HashSet<>();
-
-        for(Future<HashSet<String>> future : futures){
-            try {
-                returnSet.addAll(future.get());
-            } catch (InterruptedException e) {
-                throw new RuntimeException(e);
-            } catch (ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
+        HashMap<String,Object> map = processingFutures(futures);
         stopWatch.stop();
 
+        if(map.get("status").equals("exception")){
+            log.info("LocationMapper exception accrued. due to http 429  userName {}", name);
+            available = false;
+            return CompletableFuture.completedFuture(map);
+        }
+
+        HashSet<String> returnSet = (HashSet<String>) map.get("result");
         log.info("LocationMapper complete. userName : {} processing time : {} ms SetSize : {}",name, stopWatch.getTime(), returnSet.size());
-        return CompletableFuture.completedFuture(returnSet);
+        return CompletableFuture.completedFuture(map);
     }
 
 
 
-    private HashSet<String> parallelProcessing(List<Ride> rideList){
+    private HashMap<String, Object> parallelProcessing(List<Ride> rideList){
         log.info("{} ~ {} ride data assigned in {}.   DataSize : {}   processing start", rideList.get(0).getStart_date_local(), rideList.get(rideList.size()-1).getStart_date_local(), Thread.currentThread().getName(), rideList.size());
+        HashMap<String, Object> hashMap = new HashMap<>();
+
+        int position = 0;
+
 
         HashSet<String> hashSet = new HashSet<>();
 
         try {
             for(Ride ride : rideList){
+                position = rideList.indexOf(ride);
                 String polyline = ride.getSummary_polyline();
                 HashSet<String> location;
                 if(polyline.equals("")) continue;
@@ -97,13 +110,19 @@ public class ParallelLocationMapper {
                 log.info("rideName : {} complete. ", ride.getName());
                 hashSet.addAll(location);
             }
-        } catch (Exception e){
-            e.printStackTrace();
-        }
+        } catch (WebClientResponseException e){
+            log.info("kakao api request capacity full");
 
+            hashMap.put("result", hashSet);
+            hashMap.put("status", "exception");
+            hashMap.put("remain", rideList.subList(position, rideList.size()));
+            return hashMap;
+        }
+        hashMap.put("result", hashSet);
+        hashMap.put("status", "finish");
         log.info("{} ~ {} ride data processing complete.  {} ", rideList.get(0).getStart_date_local(), rideList.get(rideList.size()-1).getStart_date_local(), Thread.currentThread().getName());
 
-        return hashSet;
+        return hashMap;
     }
 
     private HashSet<String> getAddress(String polyline){
@@ -122,7 +141,6 @@ public class ParallelLocationMapper {
                     .block();
             LinkedHashMap<String, HashMap> document = new LinkedHashMap<>();
             try{
-
                 document = returnData.get("documents").get(0);
 
             }catch (RuntimeException e){
@@ -227,4 +245,42 @@ public class ParallelLocationMapper {
         return avgLatLng;
     }
 
+
+    private HashMap<String, Object> processingFutures(List<Future<HashMap<String, Object>>> futures) {
+        HashMap<String, Object> returnMap = new HashMap<>();
+        List<Ride> remainRide = new ArrayList<>();
+        HashSet<String> locations = new HashSet<>();
+
+        for(Future<HashMap<String, Object>> future : futures){
+            try {
+                HashMap<String, Object> map = future.get();
+
+                if(map.get("status").equals("exception")){
+                    remainRide.addAll((Collection<? extends Ride>) map.get("remain"));
+                }
+
+                locations.addAll((Collection<? extends String>) map.get("result"));
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            } catch (ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        returnMap.put("result", locations);
+        if(! remainRide.isEmpty()){
+            returnMap.put("status", "exception");
+            returnMap.put("remain", remainRide);
+        } else returnMap.put("status", "finish");
+
+        return returnMap;
+    }
+
+    public void setAvailable(Boolean available) {
+        this.available = available;
+    }
+
+    public boolean isAvailable(){
+        return available;
+    }
 }

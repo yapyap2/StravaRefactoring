@@ -3,6 +3,7 @@ package com.example.stravarefactoring.config;
 import com.example.stravarefactoring.Repository.RideBatchRepository;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
+import com.example.stravarefactoring.Service.LocationQueue;
 import com.example.stravarefactoring.Service.ParallelLocationMapper;
 import com.example.stravarefactoring.Service.StravaService;
 import com.example.stravarefactoring.Service.UserService;
@@ -10,6 +11,7 @@ import com.example.stravarefactoring.StravaApiClient;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -42,6 +44,10 @@ public class testConfig {
     @Autowired
     UserRepository userRepository;
 
+    @Autowired
+    @Qualifier("locationQueue")
+    LocationQueue locationQueue;
+
     @Bean
     public UserService userServiceMockMapper(){
         ParallelLocationMapper mapper = mock(ParallelLocationMapper.class);
@@ -66,6 +72,6 @@ public class testConfig {
 
         when(mapper.getLocation(anyList())).thenAnswer(answer);
 
-        return new UserService(userRepository, stravaApiClient, stravaService, mapper);
+        return new UserService(userRepository, stravaApiClient, stravaService, mapper, locationQueue);
     }
 }

@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -26,7 +28,8 @@ public class UserService {
     private final UserRepository userRepository;
     private final StravaApiClient stravaApiClient;
     private final StravaService stravaService;
-    private final ParallelLocationMapper locationMapper;
+    private final ParallelLocationMapper parallelLocationMapper;
+    private final LocationQueue locationQueue;
 
     @Transactional
     public User addUser(Token token){
@@ -49,6 +52,7 @@ public class UserService {
             try {
                 List<Ride> rideList = stravaService.getRide(user);
                 user.addRide(rideList);
+                userRepository.saveAndFlush(user);
 
                 mapping(user, rideList);
                 return user;
@@ -66,6 +70,8 @@ public class UserService {
             List<Ride> rideList = stravaService.getRide(user);
             user.addRide(rideList);
 
+            userRepository.saveAndFlush(user);
+
             mapping(user,rideList);
         } catch (NoUpdateDataException e){
             e.printStackTrace();
@@ -79,12 +85,22 @@ public class UserService {
         return userRepository.findUserById(id);
     }
 
-    public void mapping(User user, List<Ride> list){
-        CompletableFuture<HashSet<String>> future = locationMapper.getLocation(list);
-        future.thenAccept(set ->{
-            user.getLocation().addAll(set);
-            log.info("userName : {}    add new Location {}",user.getName(), set);
-            userRepository.save(user);
+    private void mapping(User user, List<Ride> list){
+        CompletableFuture<HashMap<String, Object>> future = parallelLocationMapper.getLocation(list);
+        future.thenAccept(result ->{
+            if(result.get("status").equals("finish")){
+                user.getLocation().addAll((Collection<? extends String>) result.get("result"));
+                user.setLocationComplete(true);
+                log.info("userName : {}    add new Location {}",user.getName(), result.get("result"));
+                userRepository.save(user);
+            }
+
+            else{
+                user.getLocation().addAll((Collection<? extends String>) result.get("result"));
+                result.put("user", user);
+                locationQueue.addQueue(result);
+                userRepository.save(user);
+            }
         });
     }
 }

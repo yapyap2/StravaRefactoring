@@ -43,9 +43,10 @@ public class UserServiceTest {
     ParallelLocationMapper locationMapper;
     @Mock
     RideRepository rideRepository;
-
     @Mock
     UserJDBCRepository userJDBCRepository;
+    @Mock
+    LocationQueue locationQueue;
 
     List<Ride> rideList;
     List<Ride> beforeRidelist;
@@ -55,7 +56,7 @@ public class UserServiceTest {
     public void before() throws IOException, NoUpdateDataException {
         MockitoAnnotations.openMocks(this);
 
-        userService = new UserService(userRepository, client, stravaService, locationMapper);
+        userService = new UserService(userRepository, client, stravaService, locationMapper, locationQueue);
 
 
         ObjectMapper objectMapper = new ObjectMapper();

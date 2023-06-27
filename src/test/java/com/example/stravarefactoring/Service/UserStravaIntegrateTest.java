@@ -61,6 +61,8 @@ public class UserStravaIntegrateTest {
     @Autowired
     private ParallelLocationMapper locationMapper;
     @Autowired
+    LocationQueue locationQueue;
+    @Autowired
     private StravaApiClient client;
 
     @Autowired
@@ -83,7 +85,6 @@ public class UserStravaIntegrateTest {
     @Test
     @Transactional
     public void newUserTest(){
-
         User user = userService.addUser(token);
 
         User findUser  = userRepository.findUserById(token.getId());
@@ -192,7 +193,7 @@ public class UserStravaIntegrateTest {
         StravaService stravaService = new StravaService(mockClient, new RideBatchRepository(new JdbcTemplate(dataSource)), repository);
 
 
-        userService = new UserService(userRepository, mockClient, stravaService, locationMapper);
+        userService = new UserService(userRepository, mockClient, stravaService, locationMapper, locationQueue);
         Ride ride = new Ride();
         User u = new User();
         u.setName("yap test");

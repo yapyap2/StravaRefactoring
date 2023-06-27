@@ -97,11 +97,14 @@ public class User {
     private double weight;
 
     @Nullable
-    private String avg50;
+    private int avg50;
     @Nullable
-    private String avg100;
+    private int avg100;
     @Nullable
     private boolean gosu;
+
+    @Nullable
+    private boolean locationComplete = false;
 
 
 //    @Transient
@@ -109,7 +112,6 @@ public class User {
 
     @JsonIgnore
     @Nullable
-
     private int rideSeq;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
@@ -126,4 +128,8 @@ public class User {
     @CollectionTable(name = "LOCATION", joinColumns = @JoinColumn(name = "USER_ID"))
     private Set<String> location = new HashSet<>();
 
+
+    public void addKudos(int kudos){
+        totalKudos += kudos;
+    }
 }

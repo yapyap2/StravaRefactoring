@@ -49,8 +49,10 @@ public class StravaService {
             i++;
             for (Ride ride : rideList){
                 ride.setRideId(rideSeq);
-                rideSeq++;
                 ride.setUser(user);
+                rideSeq++;
+                verifyingRide(ride, user);
+                user.addKudos(ride.getKudos_count());
             }
             returnList.addAll(rideList);
         }
@@ -68,6 +70,41 @@ public class StravaService {
         Ride ride = client.getOneRide(user.getAccessToken()).get(0);
 
         return user.getLastUpdated().isBefore(ride.getStart_date_local());
+    }
+
+
+    private void verifyingRide(Ride ride, User user){
+        double distance = ride.getDistance();
+        double elevation = ride.getTotal_elevation_gain();
+        double averageSpeed = ride.getAverage_speed();
+
+        if(distance >= 50 && averageSpeed >= 30){
+            int avg50 = 0;
+
+            if(averageSpeed < 35){
+                avg50 = 1;
+            }
+            else if(averageSpeed < 40){
+                avg50 = 2;
+            }
+            else avg50 = 3;
+
+            if(user.getAvg50() < avg50) user.setAvg50(avg50);
+        }
+        if(distance >= 100 && averageSpeed >= 30){
+            int avg100 = 0;
+            user.setGosu(true);
+
+            if(averageSpeed < 35){
+                avg100 = 1;
+            }
+            if(averageSpeed < 40){
+                avg100 = 2;
+            }
+            else avg100 = 3;
+
+            if(user.getAvg100() < avg100) user.setAvg100(avg100);
+        }
     }
 
 }

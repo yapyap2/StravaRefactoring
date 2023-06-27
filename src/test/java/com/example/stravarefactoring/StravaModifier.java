@@ -23,6 +23,8 @@ public class StravaModifier {
     String userName = "yapyap";
     String pw = "1712wonwoo";
 
+    LocalDateTime now = LocalDateTime.now();
+
     public Token getToken(int i) throws SQLException, ClassNotFoundException {
         Token token = new Token();
         Class.forName("com.mysql.cj.jdbc.Driver");
@@ -65,9 +67,10 @@ public class StravaModifier {
     }
 
     public void addRide(Token token){
-        String now = LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME);
+        now = now.plusMinutes(1);
+        String strTime = now.format(DateTimeFormatter.ISO_DATE_TIME);
         webClient.post()
-                .uri("https://www.strava.com/api/v3/activities?name=" + now +"&type=Ride&sport_type=Ride&start_date_local="+ now +"&elapsed_time=1000&distance=10000")
+                .uri("https://www.strava.com/api/v3/activities?name=test&type=Ride&sport_type=Ride&start_date_local="+ strTime +"&elapsed_time=1000&distance=10000")
                 .header("Authorization", "Bearer " + token.getAccess_token())
                 .retrieve()
                 .toBodilessEntity()
