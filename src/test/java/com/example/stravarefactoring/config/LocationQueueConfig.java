@@ -7,6 +7,7 @@ import com.example.stravarefactoring.Service.ParallelLocationMapper;
 import com.example.stravarefactoring.Service.StravaService;
 import com.example.stravarefactoring.Service.UserService;
 import com.example.stravarefactoring.StravaApiClient;
+import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.domain.Ride;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
@@ -84,6 +85,25 @@ public class LocationQueueConfig {
     @Bean
     public UserService userServiceForQueue(){
         return new UserService(userRepository, stravaApiClient, stravaService, mockMapper(), mockQueue());
+    }
+
+    @Bean
+    public TestKakaoApiClient testKakaoApiClient(){
+        return new TestKakaoApiClient();
+    }
+
+    @Bean
+    public ParallelLocationMapper kakaoExceptionMapper(){
+        return new ParallelLocationMapper(testKakaoApiClient());
+    }
+    @Bean
+    public LocationQueue mockQueueKakao(){
+        return new LocationQueue(kakaoExceptionMapper(), userRepository);
+    }
+
+    @Bean
+    public UserService mockUserServiceKakao(){
+        return new UserService(userRepository,stravaApiClient,stravaService,kakaoExceptionMapper(),mockQueueKakao());
     }
 
 }

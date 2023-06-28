@@ -103,4 +103,20 @@ public class UserService {
             }
         });
     }
+
+
+    public void mapping(){
+
+        List<User> list = userRepository.findAllByLocationCompleteIsTrue();
+        HashMap<String, Object> map = new HashMap<>();
+
+        list.forEach(u -> {
+            map.put("user", u);
+            map.put("remain", u.getRides());
+
+            locationQueue.addQueue(map);
+                }
+        );
+
+    }
 }

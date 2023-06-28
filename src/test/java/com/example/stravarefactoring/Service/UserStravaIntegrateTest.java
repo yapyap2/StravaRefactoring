@@ -22,6 +22,7 @@ import org.mockito.ArgumentMatchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -52,6 +53,7 @@ public class UserStravaIntegrateTest {
     Token token;
 
     @Autowired
+    @Qualifier("userService")
     private UserService userService;
 
     @Autowired
@@ -59,6 +61,7 @@ public class UserStravaIntegrateTest {
     @Autowired
     private RideRepository rideRepository;
     @Autowired
+    @Qualifier("parallelLocationMapper")
     private ParallelLocationMapper locationMapper;
     @Autowired
     LocationQueue locationQueue;

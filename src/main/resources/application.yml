@@ -20,9 +20,9 @@ spring:
   jpa:
     open-in-view: false
     generate-ddl: true
-    show-sql: true
+    show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
 
     properties:
       hibernate:
@@ -33,16 +33,16 @@ spring:
           batch_size: 100
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://yapdb.c7uknqplmcnk.ap-northeast-2.rds.amazonaws.com:3306/yaptrava?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&rewriteBatchedStatements=true
-#    url: jdbc:mysql://localhost:3306/yaptrava?rewriteBatchedStatements=true&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999
-    username: yapyap
+#    url: jdbc:mysql://yapdb.c7uknqplmcnk.ap-northeast-2.rds.amazonaws.com:3306/yaptrava?serverTimezone=Asia/Seoul&characterEncoding=UTF-8&profileSQL=true&logger=Slf4JLogger&maxQuerySizeToLog=999999&rewriteBatchedStatements=true
+    url: jdbc:mysql://localhost:3306/yaptrava?rewriteBatchedStatements=true
+    username: root
     password: 1712wonwoo
 
-server:
-  ssl:
-    enabled: true
-    key-store: classpath:keystore.p12
-    key-store-password: 1712wonwoo
-    key-store-type: PKCS12
-    key-alias: 1
-  port: 8080
+#server:
+#  ssl:
+#    enabled: true
+#    key-store: classpath:keystore.p12
+#    key-store-password: 1712wonwoo
+#    key-store-type: PKCS12
+#    key-alias: 1
+#  port: 8080

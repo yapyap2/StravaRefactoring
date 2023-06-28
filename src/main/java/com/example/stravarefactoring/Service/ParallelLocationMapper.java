@@ -3,6 +3,7 @@ package com.example.stravarefactoring.Service;
 
 import com.example.stravarefactoring.domain.Ride;
 import com.google.maps.model.LatLng;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
@@ -18,9 +19,11 @@ import java.util.concurrent.*;
 
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class ParallelLocationMapper {
     private final Integer THREAD_POOL_SIZE = 10;
     private final Double THREAD_ASSIGNMENT_SIZE = 5.0;
+    private final KakaoApiClient kakaoApiClient;
     private Boolean available = true;
     WebClient webClient = WebClient.builder().build();
 
@@ -133,16 +136,10 @@ public class ParallelLocationMapper {
         latLngList = calculateAvg(latLngList);
 
         for(LatLng latLng : latLngList){
-            HashMap<String, List<LinkedHashMap>> returnData = webClient.get()
-                    .uri("https://dapi.kakao.com/v2/local/geo/coord2address?x=" + latLng.lng + "&y=" + latLng.lat)
-                    .header("Authorization", "KakaoAK 8b28f1050844ddb7dbf7c11bd77d959e")
-                    .retrieve()
-                    .bodyToMono(HashMap.class)
-                    .block();
+            HashMap<String, List<LinkedHashMap>> returnData = kakaoApiClient.api(latLng);
             LinkedHashMap<String, HashMap> document = new LinkedHashMap<>();
             try{
                 document = returnData.get("documents").get(0);
-
             }catch (RuntimeException e){
                 continue;
             }

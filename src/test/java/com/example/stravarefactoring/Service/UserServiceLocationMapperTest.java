@@ -3,6 +3,7 @@ package com.example.stravarefactoring.Service;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaModifier;
+import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.config.LocationQueueConfig;
 import com.example.stravarefactoring.domain.Token;
 import com.example.stravarefactoring.domain.User;
@@ -133,19 +134,80 @@ public class UserServiceLocationMapperTest {
     }
 
 
+    @Test
+    public void kakaoExceptionTest() throws SQLException, ClassNotFoundException {
+        token = stravaModifier.getToken(2);
 
-    private void awaitTermination() {
-        ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean("MapperAsyncExecutor", ThreadPoolTaskExecutor.class);
+        UserService service = applicationContext.getBean("mockUserServiceKakao", UserService.class);
+        TestKakaoApiClient testKakaoApiClient = applicationContext.getBean("testKakaoApiClient", TestKakaoApiClient.class);
+        LocationQueue queue = applicationContext.getBean("mockQueueKakao", LocationQueue.class);
 
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            throw new RuntimeException(e);
-        }
-        while (true) {
-            if (taskExecutor.getActiveCount() == 0) {
-                break;
+        service.addUser(token);
+        awaitTermination();
+
+        User user1 = userRepository.findUserById(token.getId());
+        assertTrue(user1.getLocation().size() > 0);
+
+        testKakaoApiClient.initialize(1000);
+
+        queue.scheduleProcessing();
+        awaitTermination();
+
+        User user2 = userRepository.findUserById(token.getId());
+        assertTrue(user2.getLocation().size() > user1.getLocation().size());
+
+    }
+
+    @Test
+    public void queueWaitingTest() throws SQLException, ClassNotFoundException {
+        token = stravaModifier.getToken(2);
+
+        UserService service = applicationContext.getBean("mockUserServiceKakao", UserService.class);
+        TestKakaoApiClient testKakaoApiClient = applicationContext.getBean("testKakaoApiClient", TestKakaoApiClient.class);
+        LocationQueue queue = applicationContext.getBean("mockQueueKakao", LocationQueue.class);
+
+        User u1 = service.addUser(token);
+
+        token = stravaModifier.getToken(1);
+
+        User u2 = service.addUser(token);
+        awaitTermination();
+
+        User user1 = userRepository.findUserById(u1.getId());
+        User user2 = userRepository.findUserById(u2.getId());
+
+        testKakaoApiClient.initialize(3000);
+        queue.scheduleProcessing();
+        awaitTermination();
+
+        User findUser1 = userRepository.findUserById(user1.getId());
+        User findUser2 = userRepository.findUserById(user2.getId());
+
+        assertTrue(findUser1.getLocation().size() > user1.getLocation().size());
+        assertTrue(findUser2.getLocation().size() > user2.getLocation().size());
+
+
+
+
+
+
+
+    }
+
+
+
+        private void awaitTermination() {
+            ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean("MapperAsyncExecutor", ThreadPoolTaskExecutor.class);
+
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            while (true) {
+                if (taskExecutor.getActiveCount() == 0) {
+                    break;
+                }
             }
         }
-    }
 }

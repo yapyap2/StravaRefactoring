@@ -33,6 +33,7 @@ public class LocationQueue {
 
     @Scheduled(cron = "0 0 00 * * ?")
     public void scheduleProcessing(){
+        log.info("scheduled mapping logic start.   queueSize: {}", waitingQueue.size());
         parallelLocationMapper.setAvailable(true);
 
         while(!waitingQueue.isEmpty() && parallelLocationMapper.isAvailable()){
@@ -49,8 +50,10 @@ public class LocationQueue {
                 }
 
                 else{
+                    user.getLocation().addAll((Collection<? extends String>) result.get("result"));
                     result.put("user", user);
                     addQueue(result);
+                    userRepository.save(user);
                 }
             });
         }
