@@ -5,6 +5,7 @@ import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import org.hibernate.collection.spi.PersistentSet;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @Entity
+@ToString(exclude = {"location", "rides"})
 public class User {
 
     public User(Token token){
@@ -114,7 +116,7 @@ public class User {
     @Nullable
     private int rideSeq;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "user")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "user")
     @Nullable
     private List<Ride> rides = new ArrayList<>();
 
@@ -123,7 +125,7 @@ public class User {
         rides.addAll(0,rideList);
     }
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection(fetch = FetchType.LAZY)
     @Nullable
     @CollectionTable(name = "LOCATION", joinColumns = @JoinColumn(name = "USER_ID"))
     private Set<String> location = new HashSet<>();

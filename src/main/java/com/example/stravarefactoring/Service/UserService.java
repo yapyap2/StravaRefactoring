@@ -41,7 +41,7 @@ public class UserService {
         log.info("incoming request   id : {}", token.getId());
 
 
-        user = userRepository.findUserById(userInfo.getId());
+        user = userRepository.findUserByIdEager(userInfo.getId());
 
         if(user != null){
             user.setAccessToken(token.getAccess_token());

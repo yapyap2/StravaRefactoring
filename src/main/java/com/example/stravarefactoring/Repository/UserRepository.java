@@ -3,6 +3,7 @@ package com.example.stravarefactoring.Repository;
 import com.example.stravarefactoring.domain.User;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -17,6 +18,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     User findUserById(int id);
 
+    @EntityGraph(attributePaths = {"rides", "location"})
     List<User> findAllByLocationCompleteIsTrue();
 
+    @Query("select u from User u join fetch u.rides join fetch u.location where u.id = :userId")
+    User findUserByIdEager(@Param("userId") int userId);
 }

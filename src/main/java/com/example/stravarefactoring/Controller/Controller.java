@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @CrossOrigin
@@ -25,9 +27,16 @@ public class Controller {
         return userService.addUser(token);
     }
 
-    @GetMapping
+    @GetMapping("/mapping")
     public void mapping(){
         userService.mapping();
         log.info("force mapping started");
     }
+
+//    @GetMapping("/getLocation")
+//    public List<String> getLocation(@RequestParam int id){
+//
+//
+//
+//    }
 }
