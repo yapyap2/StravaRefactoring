@@ -58,4 +58,28 @@ public class LocationQueue {
             });
         }
     }
+
+    public HashMap<String, Object> getStatus(int userId, int ride){
+
+        Iterator<HashMap<String, Object>> iterator = waitingQueue.iterator();
+        int index = 0;
+        while (iterator.hasNext()) {
+            HashMap<String, Object> element = iterator.next();
+            User user = (User) element.get("user");
+            List<Ride> list = (List<Ride>) element.get("remain");
+            if (user.getId() == userId) {
+
+                Double remainRide = (double) list.size();   //이거 int가 아니라 list임
+                HashMap<String, Object> map = new HashMap<>();
+
+                map.put("position", index);
+                Double percentage =(remainRide/ ride) * 100;
+                map.put("percentage", Math.round(percentage * 100) / 100.0);
+
+                return map;
+            }
+            index++;
+        }
+        return null;
+    }
 }

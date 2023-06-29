@@ -20,6 +20,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -200,6 +201,21 @@ public class UserServiceLocationMapperTest {
         List<User> users = userRepository.findAllByLocationCompleteIsTrue();
 
         users.forEach(u -> System.out.println(u));
+    }
+
+    @Test
+    public void getLocationTest() throws SQLException, ClassNotFoundException {
+        UserService service = applicationContext.getBean("mockUserServiceKakao", UserService.class);
+
+        User u1 = service.addUser(stravaModifier.getToken(2));
+        awaitTermination();
+
+        HashMap<String, Object> map = service.getLocation(u1.getId());
+
+        assertTrue(map != null);
+        int position = (int) map.get("position");
+        assertTrue(position == 0);
+        System.out.println(map.get("percentage"));
     }
 
 

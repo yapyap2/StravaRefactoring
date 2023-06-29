@@ -8,7 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,10 +35,8 @@ public class Controller {
         log.info("force mapping started");
     }
 
-//    @GetMapping("/getLocation")
-//    public List<String> getLocation(@RequestParam int id){
-//
-//
-//
-//    }
+    @GetMapping("/getLocation")
+    public HashMap<String, Object> getLocation(@RequestParam int id){
+        return userService.getLocation(id);
+    }
 }

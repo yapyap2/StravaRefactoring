@@ -13,10 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 
@@ -106,7 +103,6 @@ public class UserService {
 
 
     public void mapping(){
-
         List<User> list = userRepository.findAllByLocationCompleteIsTrue();
         HashMap<String, Object> map = new HashMap<>();
 
@@ -117,6 +113,22 @@ public class UserService {
             locationQueue.addQueue(map);
                 }
         );
+    }
 
+    @Transactional
+    public HashMap<String, Object> getLocation(int userId){
+        User user = userRepository.findUserById(userId);
+        HashMap<String, Object> map;
+        if(user.isLocationComplete()){
+            map = new HashMap<>();
+            map.put("result", user.getLocation());
+        }
+        else{
+            map = locationQueue.getStatus(userId, user.getRideSeq()-1);
+            if(map==null){
+                map = new HashMap<>();
+            }
+            map.put("result", null);
+        } return map;
     }
 }
