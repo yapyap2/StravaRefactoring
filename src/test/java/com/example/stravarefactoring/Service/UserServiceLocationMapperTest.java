@@ -5,6 +5,7 @@ import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.StravaModifier;
 import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.config.LocationQueueConfig;
+import com.example.stravarefactoring.domain.Ride;
 import com.example.stravarefactoring.domain.Token;
 import com.example.stravarefactoring.domain.User;
 import jakarta.transaction.Transactional;
@@ -18,10 +19,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -133,6 +139,9 @@ public class UserServiceLocationMapperTest {
         User afterUser = userRepository.findUserById(token.getId());
 
         assertTrue(afterUser.getLocation().size() > findUser4.getLocation().size());
+
+        rideRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
 
@@ -147,7 +156,7 @@ public class UserServiceLocationMapperTest {
         service.addUser(token);
         awaitTermination();
 
-        User user1 = userRepository.findUserById(token.getId());
+        User user1 = userRepository.findUserByIdWithLocationEager(token.getId());
         assertTrue(user1.getLocation().size() > 0);
 
         testKakaoApiClient.initialize(1000);
@@ -155,9 +164,11 @@ public class UserServiceLocationMapperTest {
         queue.scheduleProcessing();
         awaitTermination();
 
-        User user2 = userRepository.findUserById(token.getId());
+        User user2 = userRepository.findUserByIdWithLocationEager(token.getId());
         assertTrue(user2.getLocation().size() > user1.getLocation().size());
 
+        rideRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
     @Test
@@ -187,6 +198,9 @@ public class UserServiceLocationMapperTest {
 
         assertTrue(findUser1.getLocation().size() > user1.getLocation().size());
         assertTrue(findUser2.getLocation().size() > user2.getLocation().size());
+
+        rideRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
     @Test
@@ -200,22 +214,50 @@ public class UserServiceLocationMapperTest {
 
         List<User> users = userRepository.findAllByLocationCompleteIsTrue();
 
-        users.forEach(u -> System.out.println(u));
+        assertTrue(u1.getId() == users.get(0).getId());
+
+        rideRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
+    @Autowired
+    PlatformTransactionManager transactionManager;
     @Test
     public void getLocationTest() throws SQLException, ClassNotFoundException {
         UserService service = applicationContext.getBean("mockUserServiceKakao", UserService.class);
+        TestKakaoApiClient testKakaoApiClient = applicationContext.getBean("testKakaoApiClient", TestKakaoApiClient.class);
+        LocationQueue queue = applicationContext.getBean("mockQueueKakao", LocationQueue.class);
 
-        User u1 = service.addUser(stravaModifier.getToken(2));
+        User u2 = service.addUser(stravaModifier.getToken(2));
+        awaitTermination();
+        User u1 = service.addUser(stravaModifier.getToken(1));
         awaitTermination();
 
-        HashMap<String, Object> map = service.getLocation(u1.getId());
 
-        assertTrue(map != null);
-        int position = (int) map.get("position");
-        assertTrue(position == 0);
-        System.out.println(map.get("percentage"));
+        User findUser1 = userRepository.findUserByIdWithLocationEager(u1.getId());
+        User findUser2 = userRepository.findUserByIdWithLocationEager(u2.getId());
+
+        assertTrue(!findUser1.isLocationComplete());
+        assertTrue(!findUser2.isLocationComplete());
+
+        testKakaoApiClient.initialize(2000);
+        queue.scheduleProcessing();
+        awaitTermination();
+
+        HashMap<String, Object> map1 = service.getLocation(u1.getId());
+        HashMap<String, Object> map2 = service.getLocation(u2.getId());
+
+        Set<String> set1 = (Set<String>) map1.get("result");
+
+        assertTrue(set1.size() != 0);
+        assertTrue(map2.get("result") == null);
+
+        Double percentage = (Double) map2.get("percentage");
+        assertTrue(percentage < 100);
+
+
+        rideRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
 

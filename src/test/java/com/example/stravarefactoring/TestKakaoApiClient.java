@@ -2,6 +2,7 @@ package com.example.stravarefactoring;
 
 import com.example.stravarefactoring.Service.KakaoApiClient;
 import com.google.maps.model.LatLng;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+@Component
 public class TestKakaoApiClient extends KakaoApiClient {
 
     WebClient webClient = WebClient.builder().build();

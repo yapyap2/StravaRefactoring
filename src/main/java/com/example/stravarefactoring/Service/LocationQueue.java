@@ -39,8 +39,10 @@ public class LocationQueue {
         while(!waitingQueue.isEmpty() && parallelLocationMapper.isAvailable()){
 
             HashMap<String, Object> map = waitingQueue.poll();
-            CompletableFuture<HashMap<String, Object>> future = parallelLocationMapper.getLocation((List<Ride>) map.get("remain"));
+            List<Ride> remain = (List<Ride>) map.get("remain");
+            CompletableFuture<HashMap<String, Object>> future = parallelLocationMapper.getLocation(remain);
             User user = (User) map.get("user");
+            log.info("location mapping RESTART    userName: {} remain RideSize: {}", user.getName(), remain.size());
             future.thenAccept(result ->{
                 if(result.get("status").equals("finish")){
                     user.getLocation().addAll((Collection<? extends String>) result.get("result"));
@@ -74,7 +76,7 @@ public class LocationQueue {
 
                 map.put("position", index);
                 Double percentage =(remainRide/ ride) * 100;
-                map.put("percentage", Math.round(percentage * 100) / 100.0);
+                map.put("percentage",  Math.round(percentage * 100) / 100.0);
 
                 return map;
             }

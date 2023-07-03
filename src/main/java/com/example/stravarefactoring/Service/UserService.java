@@ -102,22 +102,13 @@ public class UserService {
     }
 
 
-    public void mapping(){
-        List<User> list = userRepository.findAllByLocationCompleteIsTrue();
-        HashMap<String, Object> map = new HashMap<>();
-
-        list.forEach(u -> {
-            map.put("user", u);
-            map.put("remain", u.getRides());
-
-            locationQueue.addQueue(map);
-                }
-        );
+    public void forceMapping(){
+        locationQueue.scheduleProcessing();
     }
 
     @Transactional
     public HashMap<String, Object> getLocation(int userId){
-        User user = userRepository.findUserById(userId);
+        User user = userRepository.findUserByIdWithLocationEager(userId);
         HashMap<String, Object> map;
         if(user.isLocationComplete()){
             map = new HashMap<>();

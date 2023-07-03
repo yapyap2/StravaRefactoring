@@ -1,6 +1,7 @@
 package com.example.stravarefactoring.Service;
 
 
+import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.domain.Ride;
 import com.google.maps.model.LatLng;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +28,7 @@ public class ParallelLocationMapper {
     private Boolean available = true;
     WebClient webClient = WebClient.builder().build();
 
-    BasicThreadFactory factory = new BasicThreadFactory.Builder().namingPattern("ThreadTest-%d").build();
+    BasicThreadFactory factory = new BasicThreadFactory.Builder().namingPattern("parallelThread-%d").build();
     ExecutorService service = Executors.newFixedThreadPool(THREAD_POOL_SIZE, factory);
 
     @Async("MapperAsyncExecutor")
@@ -114,7 +115,7 @@ public class ParallelLocationMapper {
                 hashSet.addAll(location);
             }
         } catch (WebClientResponseException e){
-            log.info("kakao api request capacity full");
+          log.info("kakao api request capacity full");
 
             hashMap.put("result", hashSet);
             hashMap.put("status", "exception");

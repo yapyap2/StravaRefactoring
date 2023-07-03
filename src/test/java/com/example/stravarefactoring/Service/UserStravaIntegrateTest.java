@@ -171,7 +171,7 @@ public class UserStravaIntegrateTest {
         assertTrue(user1.getRides().size() > 0);
         awaitTermination();
 
-        User findUser2 = userRepository.findUserById(user1.getId());
+        User findUser2 = userRepository.findUserByIdWithLocationEager(user1.getId());
 
         assertTrue(findUser2.getLocation().size() != 0);
 
@@ -235,32 +235,6 @@ public class UserStravaIntegrateTest {
         rideRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
     }
-
-//    @Test
-//    public void rollBackTest(){
-//        RideBatchRepository rideBatchRepository = mock(RideBatchRepository.class);
-//        ParallelLocationMapper mockMapper = mock(ParallelLocationMapper.class);
-//
-//        StravaService stravaService = new StravaService(client, rideBatchRepository, repository);
-//
-//
-//        userService = new UserService(userRepository, client, stravaService, mockMapper, rideRepository,userJDBCRepository);
-//
-//        doThrow(new RuntimeException()).when(rideBatchRepository).saveAll(anyList());
-//
-//        assertThrows(RuntimeException.class, () -> {
-//            try{
-//                userService.addUser(token);
-//            } catch (RuntimeException e){
-//                e.printStackTrace();
-//                throw e;
-//            }
-//        });
-//
-//        assertTrue(userRepository.findUserById(token.getId()) == null);
-//        assertTrue(rideRepository.findAllByUserId(token.getId()) == null);
-//    }
-
 
     private void awaitTermination() {
         ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean("MapperAsyncExecutor", ThreadPoolTaskExecutor.class);

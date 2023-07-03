@@ -1,5 +1,6 @@
 package com.example.stravarefactoring.Controller;
 
+import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.domain.Token;
 import com.example.stravarefactoring.domain.User;
 import com.example.stravarefactoring.Service.UserService;
@@ -21,6 +22,8 @@ public class Controller {
 
     private final StravaApiClient client;
 
+    private final TestKakaoApiClient kakaoApiClient;
+
     @GetMapping("/request")
     public User userRequest(@RequestParam("code") String code){
 
@@ -31,12 +34,17 @@ public class Controller {
 
     @GetMapping("/mapping")
     public void mapping(){
-        userService.mapping();
+        userService.forceMapping();
         log.info("force mapping started");
     }
 
     @GetMapping("/getLocation")
     public HashMap<String, Object> getLocation(@RequestParam int id){
         return userService.getLocation(id);
+    }
+
+    @GetMapping("/initialize")
+    public void initialize(@RequestParam int count){
+        kakaoApiClient.initialize(count);
     }
 }

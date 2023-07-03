@@ -23,4 +23,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("select u from User u join fetch u.rides join fetch u.location where u.id = :userId")
     User findUserByIdEager(@Param("userId") int userId);
+
+    @Query("select u from User u left join fetch u.location where u.id = :userId")
+    User findUserByIdWithLocationEager(@Param("userId") int userId);
 }

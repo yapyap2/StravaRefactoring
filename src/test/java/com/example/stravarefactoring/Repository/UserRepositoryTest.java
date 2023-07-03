@@ -75,11 +75,17 @@ public class UserRepositoryTest {
                 System.out.println(findUser1.getRides().get(0).getName());
             }
         });
+
+        rideRepository.deleteAllInBatch();
+        userRepository.deleteAllInBatch();
     }
 
 
     @Autowired
     ApplicationContext applicationContext;
+    @Autowired
+    private RideRepository rideRepository;
+
     private void awaitTermination() {
         ThreadPoolTaskExecutor taskExecutor = applicationContext.getBean("MapperAsyncExecutor", ThreadPoolTaskExecutor.class);
 
