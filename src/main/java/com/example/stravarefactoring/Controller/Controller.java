@@ -22,8 +22,6 @@ public class Controller {
 
     private final StravaApiClient client;
 
-    private final TestKakaoApiClient kakaoApiClient;
-
     @GetMapping("/request")
     public User userRequest(@RequestParam("code") String code){
 
@@ -41,10 +39,5 @@ public class Controller {
     @GetMapping("/getLocation")
     public HashMap<String, Object> getLocation(@RequestParam int id){
         return userService.getLocation(id);
-    }
-
-    @GetMapping("/initialize")
-    public void initialize(@RequestParam int count){
-        kakaoApiClient.initialize(count);
     }
 }
