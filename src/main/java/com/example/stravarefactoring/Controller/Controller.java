@@ -1,6 +1,5 @@
 package com.example.stravarefactoring.Controller;
 
-import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.domain.Token;
 import com.example.stravarefactoring.domain.User;
 import com.example.stravarefactoring.Service.UserService;

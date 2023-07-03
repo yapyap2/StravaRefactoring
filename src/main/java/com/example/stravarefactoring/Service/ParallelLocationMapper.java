@@ -1,7 +1,5 @@
 package com.example.stravarefactoring.Service;
 
-
-import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.domain.Ride;
 import com.google.maps.model.LatLng;
 import lombok.RequiredArgsConstructor;
