@@ -108,6 +108,9 @@ public class User {
     @Nullable
     private boolean locationComplete = false;
 
+    @Nullable
+    private double totalJoule;
+
 
 //    @Transient
 //    private List<Ride> recentRides = new ArrayList<>();
@@ -121,7 +124,6 @@ public class User {
     private List<Ride> rides = new ArrayList<>();
 
     public void addRide(List<Ride> rideList){
-        lastUpdated = rideList.get(0).getStart_date_local();
         rides.addAll(0,rideList);
     }
 
@@ -134,4 +136,6 @@ public class User {
     public void addKudos(int kudos){
         totalKudos += kudos;
     }
+
+    public void addJoule(double joule){ this.totalJoule += joule;}
 }

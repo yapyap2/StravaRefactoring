@@ -69,8 +69,6 @@ public class UserRepositoryTest {
             protected void doInTransactionWithoutResult(TransactionStatus status) {
                 User findUser1 = userRepository.findUserById(u.getId());
 
-                User findUser2 = userRepository.findUserByIdEager(u.getId());
-
                 findUser1.getLocation().size();
                 System.out.println(findUser1.getRides().get(0).getName());
             }
@@ -78,6 +76,21 @@ public class UserRepositoryTest {
 
         rideRepository.deleteAllInBatch();
         userRepository.deleteAllInBatch();
+    }
+
+
+    @Autowired
+    EntityManager entityManager;
+    @Test
+    public void entityGraphFindTest() throws SQLException, ClassNotFoundException {
+        User u = userService.addUser(stravaModifier.getToken(1));
+        awaitTermination();
+        entityManager.clear();
+
+        User u2 = userRepository.findUserById(u.getId());
+
+        assertTrue(u2.getRides().size() > 0);
+
     }
 
 

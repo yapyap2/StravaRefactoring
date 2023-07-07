@@ -1,5 +1,7 @@
 package com.example.stravarefactoring.Service;
 
+import com.example.stravarefactoring.Repository.RideBatchRepository;
+import com.example.stravarefactoring.TestKakaoApiClient;
 import com.example.stravarefactoring.domain.Ride;
 import com.google.maps.model.LatLng;
 import lombok.RequiredArgsConstructor;
@@ -7,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import okhttp3.Call;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.time.StopWatch;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -24,10 +27,11 @@ public class ParallelLocationMapper {
     private final Double THREAD_ASSIGNMENT_SIZE = 5.0;
     private final KakaoApiClient kakaoApiClient;
     private Boolean available = true;
-    WebClient webClient = WebClient.builder().build();
-
     BasicThreadFactory factory = new BasicThreadFactory.Builder().namingPattern("parallelThread-%d").build();
     ExecutorService service = Executors.newFixedThreadPool(THREAD_POOL_SIZE, factory);
+
+    @Autowired
+    RideBatchRepository rideBatchRepository;
 
     @Async("MapperAsyncExecutor")
     public CompletableFuture<HashMap<String, Object>> getLocation(List<Ride> rideList){
@@ -110,6 +114,7 @@ public class ParallelLocationMapper {
                     continue;
                 }
                 log.info("rideName : {} complete. ", ride.getName());
+                ride.setMapped(true);
                 hashSet.addAll(location);
             }
         } catch (WebClientResponseException e){
@@ -118,6 +123,7 @@ public class ParallelLocationMapper {
             hashMap.put("result", hashSet);
             hashMap.put("status", "exception");
             hashMap.put("remain", rideList.subList(position, rideList.size()));
+            hashMap.put("mapped", rideList.subList(0, position));
             return hashMap;
         }
         hashMap.put("result", hashSet);
@@ -245,6 +251,7 @@ public class ParallelLocationMapper {
     private HashMap<String, Object> processingFutures(List<Future<HashMap<String, Object>>> futures) {
         HashMap<String, Object> returnMap = new HashMap<>();
         List<Ride> remainRide = new ArrayList<>();
+        List<Ride> mappedRide = new ArrayList<>();
         HashSet<String> locations = new HashSet<>();
 
         for(Future<HashMap<String, Object>> future : futures){
@@ -253,6 +260,7 @@ public class ParallelLocationMapper {
 
                 if(map.get("status").equals("exception")){
                     remainRide.addAll((Collection<? extends Ride>) map.get("remain"));
+                    mappedRide.addAll((Collection<? extends Ride>) map.get("mapped"));
                 }
 
                 locations.addAll((Collection<? extends String>) map.get("result"));
@@ -265,6 +273,7 @@ public class ParallelLocationMapper {
 
         returnMap.put("result", locations);
         if(! remainRide.isEmpty()){
+            rideBatchRepository.batchUpdateRides(mappedRide);
             returnMap.put("status", "exception");
             returnMap.put("remain", remainRide);
         } else returnMap.put("status", "finish");

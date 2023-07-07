@@ -21,7 +21,7 @@ public class StravaService {
     private final RideBatchRepository rideBatchRepository;
 
     private final RideRepository rideRepository;
-    public List<Ride> getRide(User user) throws NoUpdateDataException {
+    public List<Ride> getRide(User  user) throws NoUpdateDataException {
         int i = 1;
         List<Ride> returnList = new ArrayList<>();
         List<Ride> rideList;
@@ -53,16 +53,14 @@ public class StravaService {
                 rideSeq++;
                 verifyingRide(ride, user);
                 user.addKudos(ride.getKudos_count());
+                user.addJoule(ride.getTotalWatts());
             }
             returnList.addAll(rideList);
         }
 
         user.setRideSeq(rideSeq);
 
-        rideBatchRepository.saveAll(returnList);
-//        rideRepository.saveAll(returnList);
-
-        return returnList;
+        return rideBatchRepository.saveAll(returnList);
     }
 
     public Boolean checkUpdate(User user){

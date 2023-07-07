@@ -56,7 +56,7 @@ public class UserServiceTest {
     public void before() throws IOException, NoUpdateDataException {
         MockitoAnnotations.openMocks(this);
 
-        userService = new UserService(userRepository, client, stravaService, locationMapper, locationQueue);
+        userService = new UserService(rideRepository, userRepository, client, stravaService, locationMapper, locationQueue, userJDBCRepository);
 
 
         ObjectMapper objectMapper = new ObjectMapper();

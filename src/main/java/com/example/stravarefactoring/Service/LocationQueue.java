@@ -1,5 +1,6 @@
 package com.example.stravarefactoring.Service;
 
+import com.example.stravarefactoring.Repository.UserJDBCRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.domain.Ride;
 import com.example.stravarefactoring.domain.User;
@@ -22,7 +23,7 @@ public class LocationQueue {
 
     private final ParallelLocationMapper parallelLocationMapper;
 
-    private final UserRepository userRepository;
+    private final UserJDBCRepository userJDBCRepository;
 
     public void addQueue(HashMap<String, Object> map){
         waitingQueue.add(map);
@@ -40,22 +41,30 @@ public class LocationQueue {
 
             HashMap<String, Object> map = waitingQueue.poll();
             List<Ride> remain = (List<Ride>) map.get("remain");
-            CompletableFuture<HashMap<String, Object>> future = parallelLocationMapper.getLocation(remain);
             User user = (User) map.get("user");
             log.info("location mapping RESTART    userName: {} remain RideSize: {}", user.getName(), remain.size());
+
+            CompletableFuture<HashMap<String, Object>> future = parallelLocationMapper.getLocation(remain);
             future.thenAccept(result ->{
                 if(result.get("status").equals("finish")){
-                    user.getLocation().addAll((Collection<? extends String>) result.get("result"));
+                    HashSet<String> resultSet = new HashSet<>((HashSet<String>) result.get("result"));
+                    resultSet.removeAll(user.getLocation());
+                    user.getLocation().addAll(resultSet);
                     user.setLocationComplete(true);
+
                     log.info("userName : {}    add new Location {}",user.getName(), result.get("result"));
-                    userRepository.save(user);
+                    userJDBCRepository.updateUserWithLocation(user,resultSet);
                 }
 
                 else{
-                    user.getLocation().addAll((Collection<? extends String>) result.get("result"));
+                    HashSet<String> resultSet = new HashSet<>((HashSet<String>) result.get("result"));
+
+                    resultSet.removeAll(user.getLocation());
+                    user.getLocation().addAll(resultSet);
                     result.put("user", user);
                     addQueue(result);
-                    userRepository.save(user);
+
+                    userJDBCRepository.updateUserWithLocation(user,resultSet);
                 }
             });
         }

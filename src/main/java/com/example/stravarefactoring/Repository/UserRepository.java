@@ -21,9 +21,18 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @EntityGraph(attributePaths = {"rides", "location"})
     List<User> findAllByLocationCompleteIsTrue();
 
-    @Query("select u from User u join fetch u.rides join fetch u.location where u.id = :userId")
-    User findUserByIdEager(@Param("userId") int userId);
 
     @Query("select u from User u left join fetch u.location where u.id = :userId")
     User findUserByIdWithLocationEager(@Param("userId") int userId);
+
+    List<User> findAllByLocationCompleteIsFalse();
+
+    @Query("select u from User u order by u.totalDistance desc limit 5")
+    List<User> top5Distance();
+
+    @Query("select u from User u order by u.totalElevation desc limit 5")
+    List<User> top5Elevation();
+
+    @Query("select u from User u order by ((u.totalDistance/100) / u.totalElevation) desc limit 5")
+    List<User> top5Climber();
 }

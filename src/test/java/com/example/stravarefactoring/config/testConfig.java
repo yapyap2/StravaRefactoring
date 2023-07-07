@@ -2,6 +2,7 @@ package com.example.stravarefactoring.config;
 
 import com.example.stravarefactoring.Repository.RideBatchRepository;
 import com.example.stravarefactoring.Repository.RideRepository;
+import com.example.stravarefactoring.Repository.UserJDBCRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.Service.LocationQueue;
 import com.example.stravarefactoring.Service.ParallelLocationMapper;
@@ -48,6 +49,9 @@ public class testConfig {
     @Qualifier("locationQueue")
     LocationQueue locationQueue;
 
+    @Autowired
+    UserJDBCRepository userJDBCRepository;
+
     @Bean
     public UserService userServiceMockMapper(){
         ParallelLocationMapper mapper = mock(ParallelLocationMapper.class);
@@ -72,6 +76,6 @@ public class testConfig {
 
         when(mapper.getLocation(anyList())).thenAnswer(answer);
 
-        return new UserService(userRepository, stravaApiClient, stravaService, mapper, locationQueue);
+        return new UserService(rideRepository, userRepository, stravaApiClient, stravaService, mapper, locationQueue, userJDBCRepository);
     }
 }

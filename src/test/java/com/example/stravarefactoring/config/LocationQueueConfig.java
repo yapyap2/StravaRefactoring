@@ -1,6 +1,7 @@
 package com.example.stravarefactoring.config;
 
 import com.example.stravarefactoring.Repository.RideRepository;
+import com.example.stravarefactoring.Repository.UserJDBCRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import com.example.stravarefactoring.Service.LocationQueue;
 import com.example.stravarefactoring.Service.ParallelLocationMapper;
@@ -15,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.List;
@@ -39,7 +39,13 @@ public class LocationQueueConfig {
     @Autowired
     StravaService stravaService;
 
+    @Autowired
+    TestKakaoApiClient testKakaoApiClient;
+
     ParallelLocationMapper mapper;
+
+    @Autowired
+    UserJDBCRepository userJDBCRepository;
 
     @Bean
     public ParallelLocationMapper mockMapper(){
@@ -77,33 +83,28 @@ public class LocationQueueConfig {
 
     @Bean
     public LocationQueue mockQueue(){
-        LocationQueue locationQueue = new LocationQueue(mockMapper(), userRepository);
+        LocationQueue locationQueue = new LocationQueue(mockMapper(), userJDBCRepository);
 
         return locationQueue;
     }
 
     @Bean
     public UserService userServiceForQueue(){
-        return new UserService(userRepository, stravaApiClient, stravaService, mockMapper(), mockQueue());
-    }
-
-    @Bean
-    public TestKakaoApiClient testKakaoApiClient(){
-        return new TestKakaoApiClient();
+        return new UserService(rideRepository, userRepository, stravaApiClient, stravaService, mockMapper(), mockQueue(),userJDBCRepository);
     }
 
     @Bean
     public ParallelLocationMapper kakaoExceptionMapper(){
-        return new ParallelLocationMapper(testKakaoApiClient());
+        return new ParallelLocationMapper(testKakaoApiClient);
     }
     @Bean
     public LocationQueue mockQueueKakao(){
-        return new LocationQueue(kakaoExceptionMapper(), userRepository);
+        return new LocationQueue(kakaoExceptionMapper(), userJDBCRepository);
     }
 
     @Bean
     public UserService mockUserServiceKakao(){
-        return new UserService(userRepository,stravaApiClient,stravaService,kakaoExceptionMapper(),mockQueueKakao());
+        return new UserService(rideRepository ,userRepository,stravaApiClient,stravaService,kakaoExceptionMapper(),mockQueueKakao(), userJDBCRepository);
     }
 
 }

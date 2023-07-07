@@ -3,6 +3,7 @@ package com.example.stravarefactoring.domain;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.ToString;
@@ -48,6 +49,9 @@ public class Ride {
     private String summary_polyline;
 
     public double average_speed;
+
+    @Nullable
+    public boolean mapped = false;
 
     @JsonCreator
     public Ride(@JsonProperty("name")String name, @JsonProperty("distance")double distance, @JsonProperty("moving_time")int moving_time, @JsonProperty("total_elevation_gain")double total_elevation_gain, @JsonProperty("start_date_local")LocalDateTime start_date_local, @JsonProperty("map")HashMap<String, Object> map, @JsonProperty("average_speed")double average_speed, @JsonProperty("kudos_count")int kudos_count, @JsonProperty("comment_count")int comment_count, @JsonProperty("total_photo_count")int total_photo_count, @JsonProperty("average_watts")int average_watts

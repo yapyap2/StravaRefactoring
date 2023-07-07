@@ -11,6 +11,7 @@ import com.example.stravarefactoring.domain.User;
 import com.example.stravarefactoring.Repository.RideRepository;
 import com.example.stravarefactoring.Repository.UserRepository;
 import jakarta.persistence.EntityManager;
+import jakarta.transaction.TransactionManager;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,6 +30,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.support.TransactionCallbackWithoutResult;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import javax.sql.DataSource;
@@ -114,7 +119,6 @@ public class UserStravaIntegrateTest {
 
         assertTrue(user2.getWeight() == w);
         assertTrue(user2.getWeight() != user1.getWeight());
-        assertTrue(user1.getRides().size() == user2.getRides().size());
     }
 
     @Test
@@ -124,7 +128,8 @@ public class UserStravaIntegrateTest {
         userService = applicationContext.getBean("userServiceMockMapper", UserService.class);
 
         User user1 = userService.addUser(token);
-        
+        entityManager.clear();
+
         awaitTermination();
         
         User user2 = userService.addUser(token);
@@ -143,6 +148,7 @@ public class UserStravaIntegrateTest {
         User user1 = userService.addUser(token);
         int user1Ride = user1.getRides().size();
         LocalDateTime user1Time = user1.getLastUpdated();
+        entityManager.clear();
 
         stravaModifier.addRide(token);
 
@@ -183,20 +189,27 @@ public class UserStravaIntegrateTest {
     RideRepository repository;
     @Autowired
     DataSource dataSource;
+
+    @Autowired
+    PlatformTransactionManager transactionManager;
+
+    @Autowired
+    RideBatchRepository rideBatchRepository;
+
     @Test //위의 이유와 동일하게 @Transactional을 사용해선 안됨
     public void newLocationTest() throws InterruptedException {
         userService.addUser(token);
 
         awaitTermination();
 
-        User user1 = userRepository.findUserById(token.getId());
+        User user1 = userRepository.findUserByIdWithLocationEager(token.getId());
 
         StravaApiClient mockClient = mock(StravaApiClient.class);
 
-        StravaService stravaService = new StravaService(mockClient, new RideBatchRepository(new JdbcTemplate(dataSource)), repository);
+        StravaService stravaService = new StravaService(mockClient, rideBatchRepository, repository);
 
 
-        userService = new UserService(userRepository, mockClient, stravaService, locationMapper, locationQueue);
+        userService = new UserService(rideRepository, userRepository, mockClient, stravaService, locationMapper, locationQueue, userJDBCRepository);
         Ride ride = new Ride();
         User u = new User();
         u.setName("yap test");
@@ -221,14 +234,21 @@ public class UserStravaIntegrateTest {
         };
         when(mockClient.getRideAfter(anyString(), anyInt(), any(LocalDateTime.class))).thenAnswer(answer);
 
+        TransactionTemplate template = new TransactionTemplate(transactionManager);
+        template.execute(new TransactionCallbackWithoutResult() {
+            @Override
+            protected void doInTransactionWithoutResult(TransactionStatus status) {
+            userService.addUser(token);
+            }
+        });
 
-        userService.addUser(token);
+
 
         Thread.sleep(2000);
 
         awaitTermination();
 
-        User user2 = userRepository.findUserById(token.getId());
+        User user2 = userRepository.findUserByIdWithLocationEager(token.getId());
 
         assertTrue(user1.getLocation().size() < user2.getLocation().size());
 

@@ -2,8 +2,14 @@ package com.example.stravarefactoring.Repository;
 
 import com.example.stravarefactoring.domain.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
@@ -11,22 +17,37 @@ public class UserJDBCRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public void save(User user){
 
-        String sql = "insert into " +
-                "user" +
-                "(access_token, avg100, avg50, biggest_climb_elevation_gain, biggest_ride_distance, bio, city," +
-                "country, create_at, follower_count, friend_count, gosu, last_updated, name, profile, refresh_token, ride_seq," +
-                " state, total_distance, total_elevation, total_kudos, total_time, update_at, weight, id) " +
-                "values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+    public void updateUserWithLocation(User user, Set<String> location){
+        try {
+            List<String> list = location.stream().toList();
 
-        jdbcTemplate.update(sql, user.getAccessToken(), user.getAvg100(), user.getAvg50(), user.getBiggest_climb_elevation_gain(),
-                user.getBiggest_ride_distance(), user.getBio(), user.getCity(), user.getCountry(),user.getCreate_at(), user.getFollower_count(), user.getFriend_count(),
-                user.isGosu(), user.getLastUpdated(), user.getName(), user.getProfile(), user.getRefreshToken(), user.getRideSeq(),
-                user.getState(), user.getTotalDistance(), user.getTotalElevation(), user.getTotalKudos(), user.getTotalTime(), user.getUpdate_at(), user.getWeight(), user.getId()
-        );
+            if (user.isLocationComplete()) {
+                String sql = "UPDATE USER SET location_complete = true where id = ?";
+                jdbcTemplate.update(sql, user.getId());
+            }
 
+            String sql2 = "INSERT INTO LOCATION VALUES(?,?)";
 
+            if (location.size() == 0) {
+                return;
+            }
+            jdbcTemplate.batchUpdate(sql2, new BatchPreparedStatementSetter() {
+                @Override
+                public void setValues(PreparedStatement ps, int i) throws SQLException {
+                    String loc = list.get(i);
+                    ps.setInt(1, user.getId());
+                    ps.setString(2, loc);
+                }
+
+                @Override
+                public int getBatchSize() {
+                    return location.size();
+                }
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+    }
     }
 
 }
