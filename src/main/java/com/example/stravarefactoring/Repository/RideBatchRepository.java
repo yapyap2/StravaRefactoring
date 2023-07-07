@@ -20,7 +20,7 @@ public class RideBatchRepository {
 
     @PostConstruct
     private void init(){
-        Long l = jdbcTemplate.queryForObject("SELECT MAX(id) FROM RIDE", Long.class);
+        Long l = jdbcTemplate.queryForObject("SELECT MAX(id) FROM ride", Long.class);
         if(l == null) id = 0L;
         else id = l;
     }
