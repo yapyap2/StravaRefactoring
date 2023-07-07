@@ -23,11 +23,11 @@ public class UserJDBCRepository {
             List<String> list = location.stream().toList();
 
             if (user.isLocationComplete()) {
-                String sql = "UPDATE USER SET location_complete = true where id = ?";
+                String sql = "UPDATE user SET location_complete = true where id = ?";
                 jdbcTemplate.update(sql, user.getId());
             }
 
-            String sql2 = "INSERT INTO LOCATION VALUES(?,?)";
+            String sql2 = "INSERT INTO location VALUES(?,?)";
 
             if (location.size() == 0) {
                 return;
