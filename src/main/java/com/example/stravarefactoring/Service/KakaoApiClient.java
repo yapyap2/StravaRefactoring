@@ -14,6 +14,12 @@ public class KakaoApiClient {
 
     WebClient webClient = WebClient.builder().build();
     public HashMap<String, List<LinkedHashMap>> api(LatLng latLng){
+
+        try{
+            Thread.sleep(1);
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        }
         HashMap<String, List<LinkedHashMap>> returnData = webClient.get()
                 .uri("https://dapi.kakao.com/v2/local/geo/coord2address?x=" + latLng.lng + "&y=" + latLng.lat)
                 .header("Authorization", "KakaoAK 8b28f1050844ddb7dbf7c11bd77d959e")
