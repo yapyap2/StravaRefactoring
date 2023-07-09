@@ -22,8 +22,8 @@ public class RankController {
 
     @GetMapping("/distance")
     public List<RankUser> getTop5Distance(){
-        return rankService.getTop5Distance();
         log.info("ranking controller requested. ");
+        return rankService.getTop5Distance();
     }
 
     @GetMapping("/elevation")
