@@ -119,6 +119,7 @@ public class ParallelLocationMapper {
                 hashSet.addAll(location);
             }
         } catch (WebClientResponseException e){
+            e.printStackTrace();
             if(e.getStatusCode().equals(HttpStatus.TOO_MANY_REQUESTS)) {
                 log.info("kakao api request capacity full");
 
