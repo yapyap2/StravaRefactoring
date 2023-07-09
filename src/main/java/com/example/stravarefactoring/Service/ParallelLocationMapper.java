@@ -114,7 +114,7 @@ public class ParallelLocationMapper {
                 } catch (StringIndexOutOfBoundsException e){
                     continue;
                 }
-                log.info("rideName : {} complete. ", ride.getName());
+                log.info("rideName : {} complete.   userName : {}", ride.getName(), ride.getUser().getName());
                 ride.setMapped(true);
                 hashSet.addAll(location);
             }

@@ -61,7 +61,7 @@ public class RideBatchRepositoryTest {
         rideBatchRepository.batchUpdateRides(subList);
 
 
-        List<Ride> findList2 = rideRepository.findAllByUserIdAndMappedTrue(token.getId());
+        List<Ride> findList2 = rideRepository.findAllByUserIdAndMappedFalse(token.getId());
 
         for(int i = 0; i <40; i++){
             Ride r1 = findList2.get(i);

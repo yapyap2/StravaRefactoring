@@ -131,7 +131,7 @@ public class UserService {
                     HashMap<String, Object> map = new HashMap<>();
                     map.put("user", u);
 
-                    List<Ride> rideList = rideRepository.findAllByUserIdAndMappedTrue(u.getId());
+                    List<Ride> rideList = rideRepository.findAllByUserIdAndMappedFalse(u.getId());
                     map.put("remain", rideList);
                     map.put("result", u.getLocation());
                     locationQueue.addQueue(map);
