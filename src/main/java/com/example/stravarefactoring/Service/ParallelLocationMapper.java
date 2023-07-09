@@ -10,6 +10,7 @@ import okhttp3.Call;
 import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -118,13 +119,15 @@ public class ParallelLocationMapper {
                 hashSet.addAll(location);
             }
         } catch (WebClientResponseException e){
-          log.info("kakao api request capacity full");
+            if(e.getStatusCode().equals(HttpStatus.TOO_MANY_REQUESTS)) {
+                log.info("kakao api request capacity full");
 
-            hashMap.put("result", hashSet);
-            hashMap.put("status", "exception");
-            hashMap.put("remain", rideList.subList(position, rideList.size()));
-            hashMap.put("mapped", rideList.subList(0, position));
-            return hashMap;
+                hashMap.put("result", hashSet);
+                hashMap.put("status", "exception");
+                hashMap.put("remain", rideList.subList(position, rideList.size()));
+                hashMap.put("mapped", rideList.subList(0, position));
+                return hashMap;
+            }
         }
         hashMap.put("result", hashSet);
         hashMap.put("status", "finish");
