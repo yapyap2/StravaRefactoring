@@ -4,6 +4,7 @@ import com.example.stravarefactoring.Service.RankService;
 import com.example.stravarefactoring.domain.RankRide;
 import com.example.stravarefactoring.domain.RankUser;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -14,6 +15,7 @@ import java.util.List;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
+@Slf4j
 public class RankController {
 
     private final RankService rankService;
@@ -21,6 +23,7 @@ public class RankController {
     @GetMapping("/distance")
     public List<RankUser> getTop5Distance(){
         return rankService.getTop5Distance();
+        log.info("ranking controller requested. ");
     }
 
     @GetMapping("/elevation")
