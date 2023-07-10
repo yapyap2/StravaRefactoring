@@ -132,6 +132,7 @@ public class ParallelLocationMapper {
         }
         hashMap.put("result", hashSet);
         hashMap.put("status", "finish");
+        hashMap.put("mapped", rideList);
         log.info("{} ~ {} ride data processing complete.  {} ", rideList.get(0).getStart_date_local(), rideList.get(rideList.size()-1).getStart_date_local(), Thread.currentThread().getName());
 
         return hashMap;
@@ -264,9 +265,8 @@ public class ParallelLocationMapper {
 
                 if(map.get("status").equals("exception")){
                     remainRide.addAll((Collection<? extends Ride>) map.get("remain"));
-                    mappedRide.addAll((Collection<? extends Ride>) map.get("mapped"));
                 }
-
+                mappedRide.addAll((Collection<? extends Ride>) map.get("mapped"));
                 locations.addAll((Collection<? extends String>) map.get("result"));
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
@@ -274,10 +274,10 @@ public class ParallelLocationMapper {
                 throw new RuntimeException(e);
             }
         }
+        rideBatchRepository.batchUpdateRides(mappedRide);
 
         returnMap.put("result", locations);
         if(! remainRide.isEmpty()){
-            rideBatchRepository.batchUpdateRides(mappedRide);
             returnMap.put("status", "exception");
             returnMap.put("remain", remainRide);
         } else returnMap.put("status", "finish");

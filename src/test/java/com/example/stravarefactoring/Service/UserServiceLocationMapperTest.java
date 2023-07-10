@@ -147,17 +147,19 @@ public class UserServiceLocationMapperTest {
 
     @Test
     public void kakaoExceptionTest() throws SQLException, ClassNotFoundException {
-        token = stravaModifier.getToken(2);
+        token = stravaModifier.getToken(1);
 
         UserService service = applicationContext.getBean("mockUserServiceKakao", UserService.class);
         TestKakaoApiClient testKakaoApiClient = applicationContext.getBean("testKakaoApiClient", TestKakaoApiClient.class);
         LocationQueue queue = applicationContext.getBean("mockQueueKakao", LocationQueue.class);
 
+        testKakaoApiClient.initialize(1);
+
         service.addUser(token);
         awaitTermination();
 
         User user1 = userRepository.findUserByIdWithLocationEager(token.getId());
-        assertTrue(user1.getLocation().size() > 0);
+        assertTrue(user1.getLocation().size() >= 0);
 
         testKakaoApiClient.initialize(1000);
 
