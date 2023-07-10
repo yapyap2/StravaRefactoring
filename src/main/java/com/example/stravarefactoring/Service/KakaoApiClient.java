@@ -16,7 +16,7 @@ public class KakaoApiClient {
     public HashMap<String, List<LinkedHashMap>> api(LatLng latLng){
 
         try{
-            Thread.sleep(10);
+            Thread.sleep(50);
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
