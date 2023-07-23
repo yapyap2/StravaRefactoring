@@ -101,7 +101,7 @@ public class LocationQueue {
     }
 
 
-    @Scheduled(cron = "0 15 17 * * ?")
+    @Scheduled(cron = "0 17 18 * * ?")
     public void isTime(){
         log.info("is time man!");
         log.info("is time man!");
