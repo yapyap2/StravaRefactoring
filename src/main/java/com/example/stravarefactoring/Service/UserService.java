@@ -156,8 +156,9 @@ public class UserService {
             if(map==null){
                 map = new HashMap<>();
                 map.put("status", false);
+                map.put("result", null);
             }else map.put("status", true);
-            map.put("result", null);
+            map.put("result", user.getLocation());
         } return map;
     }
 }
