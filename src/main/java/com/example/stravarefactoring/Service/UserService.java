@@ -124,17 +124,19 @@ public class UserService {
     }
 
 
+    @Transactional
     public void rebootMapper(){
         List<User> list = userRepository.findAllByLocationCompleteIsFalse();
 
         list.forEach(u -> {
-                    HashMap<String, Object> map = new HashMap<>();
-                    map.put("user", u);
+                Hibernate.initialize(u.getLocation());
+                HashMap<String, Object> map = new HashMap<>();
+                map.put("user", u);
 
-                    List<Ride> rideList = rideRepository.findAllByUserIdAndMappedFalse(u.getId());
-                    map.put("remain", rideList);
-                    map.put("result", u.getLocation());
-                    locationQueue.addQueue(map);
+                List<Ride> rideList = rideRepository.findAllByUserIdAndMappedFalse(u.getId());
+                map.put("remain", rideList);
+                map.put("result", u.getLocation());
+                locationQueue.addQueue(map);
                     }
                 );
 

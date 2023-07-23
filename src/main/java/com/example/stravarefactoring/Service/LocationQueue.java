@@ -43,34 +43,40 @@ public class LocationQueue {
             List<Ride> remain = (List<Ride>) map.get("remain");
             User user = (User) map.get("user");
             log.info("location mapping RESTART    userName: {} remain RideSize: {}", user.getName(), remain.size());
-
-            CompletableFuture<HashMap<String, Object>> future = parallelLocationMapper.getLocation(remain);
-            future.thenAccept(result ->{
-                if(result.get("status").equals("finish")){
-                    HashSet<String> resultSet = new HashSet<>((HashSet<String>) result.get("result"));
-                    resultSet.removeAll(user.getLocation());
-                    user.getLocation().addAll(resultSet);
-                    user.setLocationComplete(true);
-
-                    log.info("userName : {}    add new Location {}",user.getName(), result.get("result"));
-                    userJDBCRepository.updateUserWithLocation(user,resultSet);
-                }
-
-                else{
-                    HashSet<String> resultSet = new HashSet<>((HashSet<String>) result.get("result"));
-
-                    resultSet.removeAll(user.getLocation());
-                    user.getLocation().addAll(resultSet);
-                    result.put("user", user);
-                    addQueue(result);
-
-                    userJDBCRepository.updateUserWithLocation(user,resultSet);
-                }
-            });
+            run(user, remain);
         }
     }
 
-    public HashMap<String, Object> getStatus(int userId, int ride){
+
+    private void run(User user, List<Ride> remain){
+        CompletableFuture<HashMap<String, Object>> future = parallelLocationMapper.getLocation(remain);
+        future.thenAccept(result ->{
+            if(result.get("status").equals("finish")){
+                HashSet<String> resultSet = new HashSet<>((HashSet<String>) result.get("result"));
+                resultSet.removeAll(user.getLocation());
+                user.getLocation().addAll(resultSet);
+                user.setLocationComplete(true);
+
+                log.info("userName : {}    add new Location {}",user.getName(), result.get("result"));
+                userJDBCRepository.updateUserWithLocation(user,resultSet);
+            }
+
+            else{
+                HashSet<String> resultSet = new HashSet<>((HashSet<String>) result.get("result"));
+
+                resultSet.removeAll(user.getLocation());
+                user.getLocation().addAll(resultSet);
+                result.put("user", user);
+                addQueue(result);
+
+                if(!resultSet.isEmpty()){
+                    userJDBCRepository.updateUserWithLocation(user,resultSet);
+                }
+            }
+        });
+    }
+
+    public HashMap<String, Object> getStatus(int userId, int ride) {
 
         Iterator<HashMap<String, Object>> iterator = waitingQueue.iterator();
         int index = 0;
@@ -84,8 +90,8 @@ public class LocationQueue {
                 HashMap<String, Object> map = new HashMap<>();
 
                 map.put("position", index);
-                Double percentage =(remainRide/ ride) * 100;
-                map.put("percentage",  Math.round(percentage * 100) / 100.0);
+                Double percentage = (remainRide / ride) * 100;
+                map.put("percentage", Math.round(percentage * 100) / 100.0);
 
                 return map;
             }
@@ -93,4 +99,15 @@ public class LocationQueue {
         }
         return null;
     }
+
+
+    @Scheduled(cron = "0 5 17 * * ?")
+    public void isTime(){
+        log.info("is time man!");
+        log.info("is time man!");
+        log.info("is time man!");
+        log.info("is time man!");
+        log.info("is time man!");
+    }
+
 }
