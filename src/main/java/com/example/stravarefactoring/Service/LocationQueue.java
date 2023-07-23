@@ -32,7 +32,7 @@ public class LocationQueue {
         log.info("location queue add.   userName: {}  remainRide: {}",user.getName(),  list.size());
     }
 
-    @Scheduled(cron = "0 0 00 * * ?")
+    @Scheduled(cron = "0 0 00 * * ?", zone = "Asia/Seoul")
     public void scheduleProcessing(){
         log.info("scheduled mapping logic start.   queueSize: {}", waitingQueue.size());
         parallelLocationMapper.setAvailable(true);
@@ -101,7 +101,7 @@ public class LocationQueue {
     }
 
 
-    @Scheduled(cron = "0 22 18 * * ?")
+    @Scheduled(cron = "0 30 18 * * ?", zone = "Asia/Seoul")
     public void isTime(){
         log.info("is time man!");
         log.info("is time man!");
