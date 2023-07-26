@@ -109,6 +109,7 @@ public class ParallelLocationMapper {
                 String polyline = ride.getSummary_polyline();
                 HashSet<String> location;
                 if(polyline.equals("")) continue;
+                if(ride.getType().equals("VirtualRide")) continue;
                 try{
                     location = getAddress(polyline);
                 } catch (StringIndexOutOfBoundsException e){
